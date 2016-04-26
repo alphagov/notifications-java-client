@@ -11,6 +11,10 @@ import uk.gov.notifications.client.model.SmsRequest;
 import uk.gov.notifications.client.model.StatusRequest;
 import uk.gov.notifications.client.model.StatusResponse;
 
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+
 public class GovNotifyApiClient implements GovNotifyApi {
 
     private ClientConfiguration configuration;
@@ -21,7 +25,7 @@ public class GovNotifyApiClient implements GovNotifyApi {
      * Creates API client with specific configuration.
      * @param configuration configuration object
      */
-    public GovNotifyApiClient(ClientConfiguration configuration) {
+    public GovNotifyApiClient(ClientConfiguration configuration) throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
         this(configuration, new ApacheGovNotifyHttpClient());
     }
 
