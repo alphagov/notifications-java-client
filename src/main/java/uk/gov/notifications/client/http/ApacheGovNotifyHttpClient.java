@@ -4,12 +4,20 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.conn.BasicHttpClientConnectionManager;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.ssl.SSLContextBuilder;
+import org.apache.http.ssl.TrustStrategy;
 import org.apache.http.util.EntityUtils;
 
+import javax.net.ssl.SSLContext;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.util.Map;
 
 import static uk.gov.notifications.client.http.HttpMethod.GET;
@@ -24,10 +32,18 @@ public class ApacheGovNotifyHttpClient implements GovNotifyHttpClient {
     /**
      * Creates http client that uses Apache HttpClient as transport manager.
      */
-    public ApacheGovNotifyHttpClient() {
-        this(HttpClientBuilder.create()
-                .setConnectionManager(new BasicHttpClientConnectionManager())
-                .build());
+    public ApacheGovNotifyHttpClient() throws KeyStoreException, NoSuchAlgorithmException, KeyManagementException {
+        SSLContextBuilder builder = new SSLContextBuilder();
+        builder.loadTrustMaterial(null, new TrustStrategy() {
+            @Override
+            public boolean isTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+                return true;
+            }
+        });
+
+        SSLConnectionSocketFactory sslSF = new SSLConnectionSocketFactory(builder.build());
+
+        httpClient = HttpClients.custom().setSSLSocketFactory(sslSF).build();
     }
 
     public ApacheGovNotifyHttpClient(CloseableHttpClient httpClient) {
