@@ -54,8 +54,8 @@ or
 * `emailAddress` is the email address for the notification
 * `templateId` is the template to send
     * must be a universally unique identifier (UUID) that identifies a valid template  - templates are created in the admin tools
-* `personalisation` is the template to send
-    * must be a JSON string, with keys matching the placeholders in the template, eg {"name": "Chris"}
+* `personalisation` is the placeholders to send 
+    * must be a HashMap<String, String> which contains the key value pairs for the placeholders. 
 
 **Fetch notification by Id**
 

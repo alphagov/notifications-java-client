@@ -7,6 +7,7 @@ import uk.gov.service.notify.NotificationResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.HashMap;
 
 public class TestNotificationClient {
 
@@ -117,13 +118,21 @@ public class TestNotificationClient {
             System.out.println("Template id must be the uuid of the template and can not be empty.");
             System.exit(1);
         }
-        System.out.println("Enter the personalisation (as JSON): ");
+        System.out.println("Enter the personalisation (key:value, key:value): ");
         String personalisation = reader.readLine();
+        HashMap<String, String> properties = new HashMap<>();
+        if (personalisation != null && !personalisation.isEmpty()){
+            String[] pairs = personalisation.split(",");
+            for(String pair : pairs){
+                String[] keyValue = pair.split(":");
+                properties.put(keyValue[0], keyValue[1]);
+            }
+        }
         if (messageType.equals("sms")){
-            NotificationResponse response = client.sendSms(templateId, to, personalisation);
+            NotificationResponse response = client.sendSms(templateId, to, properties);
         }
         else{
-            NotificationResponse response = client.sendEmail(templateId, to, personalisation);
+            NotificationResponse response = client.sendEmail(templateId, to, properties);
         }
     }
 }

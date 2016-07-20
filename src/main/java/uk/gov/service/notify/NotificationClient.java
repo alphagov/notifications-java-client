@@ -10,6 +10,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
+import java.util.HashMap;
+
 import org.json.JSONObject;
 
 public class NotificationClient {
@@ -24,17 +26,17 @@ public class NotificationClient {
         this.baseUrl = baseUrl;
     }
 
-    public NotificationResponse sendEmail(String templateId, String to, String personalisation) throws NotificationClientException {
+    public NotificationResponse sendEmail(String templateId, String to, HashMap<String, String> personalisation) throws NotificationClientException {
         return postRequest("email", templateId, to, personalisation);
     }
-    public NotificationResponse sendSms(String templateId, String to, String personalisation) throws NotificationClientException {
+    public NotificationResponse sendSms(String templateId, String to, HashMap personalisation) throws NotificationClientException {
         return postRequest("sms", templateId, to, personalisation);
     }
 
-    private NotificationResponse postRequest(String messageType, String templateId, String to, String personalisation) throws NotificationClientException {
+    private NotificationResponse postRequest(String messageType, String templateId, String to, HashMap personalisation) throws NotificationClientException {
         HttpsURLConnection conn = null;
         try {
-            JSONObject body = setPersonalisation(templateId, to, personalisation);
+            JSONObject body = createBodyForRequest(templateId, to, personalisation);
 
             Authentication tg = new Authentication();
             String token = tg.create(issuer, secret);
@@ -161,13 +163,14 @@ public class NotificationClient {
         return conn;
     }
 
-    private JSONObject setPersonalisation(String templateId, String to, String personalisation) {
+    private JSONObject createBodyForRequest(String templateId, String to, HashMap<String, String> personalisation) {
         JSONObject body = new JSONObject();
         body.put("to", to);
         body.put("template", templateId);
         if(personalisation != null && !personalisation.isEmpty()){
+
             System.out.println("personalisation: " + personalisation);
-            body.put("personalisation", personalisation);
+            body.put("personalisation", new JSONObject(personalisation));
         }
         return body;
     }
