@@ -1,16 +1,17 @@
 package uk.gov.service.notify;
 
 
-import javax.net.ssl.HttpsURLConnection;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
-import java.net.*;
-import java.util.HashMap;
-
 import org.json.JSONObject;
+
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import java.io.*;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
+import java.net.Proxy;
+import java.net.URL;
+import java.security.NoSuchAlgorithmException;
+import java.util.HashMap;
 
 public class NotificationClient implements NotificationClientApi {
 
@@ -24,6 +25,13 @@ public class NotificationClient implements NotificationClientApi {
         this.secret = secret;
         this.issuer = issuer;
         this.baseUrl = baseUrl;
+
+        // Could be called from here or from outside.
+        try {
+            setDefaultSSLContext();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
     }
 
     public NotificationClient(String secret, String issuer, String baseUrl, Proxy proxy) {
@@ -34,6 +42,7 @@ public class NotificationClient implements NotificationClientApi {
     public NotificationResponse sendEmail(String templateId, String to, HashMap<String, String> personalisation) throws NotificationClientException {
         return postRequest("email", templateId, to, personalisation);
     }
+
     public NotificationResponse sendSms(String templateId, String to, HashMap<String, String> personalisation) throws NotificationClientException {
         return postRequest("sms", templateId, to, personalisation);
     }
@@ -67,10 +76,10 @@ public class NotificationClient implements NotificationClientApi {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
-        } finally{
-           if (conn != null){
-               conn.disconnect();
-           }
+        } finally {
+            if (conn != null) {
+                conn.disconnect();
+            }
         }
         return null;
     }
@@ -88,12 +97,11 @@ public class NotificationClient implements NotificationClientApi {
 
             conn.connect();
             int httpResult = conn.getResponseCode();
-            if(httpResult == 200) {
+            if (httpResult == 200) {
                 stringBuilder = readStream(new InputStreamReader(conn.getInputStream()));
                 conn.disconnect();
                 return new Notification(stringBuilder.toString());
-            }
-            else{
+            } else {
                 stringBuilder = readStream(new InputStreamReader(conn.getErrorStream(), "utf-8"));
                 throw new NotificationClientException(httpResult, stringBuilder.toString());
             }
@@ -105,8 +113,8 @@ public class NotificationClient implements NotificationClientApi {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
-        }finally {
-            if(conn != null){
+        } finally {
+            if (conn != null) {
                 conn.disconnect();
             }
         }
@@ -115,10 +123,10 @@ public class NotificationClient implements NotificationClientApi {
 
     public NotificationList getNotifications(String status, String notification_type) throws NotificationClientException {
         JSONObject data = new JSONObject();
-        if (status != null && !status.isEmpty()){
+        if (status != null && !status.isEmpty()) {
             data.put("status", status);
         }
-        if(notification_type != null && !notification_type.isEmpty()){
+        if (notification_type != null && !notification_type.isEmpty()) {
             data.put("template_type", notification_type);
         }
         StringBuilder stringBuilder;
@@ -132,12 +140,11 @@ public class NotificationClient implements NotificationClientApi {
             conn.setRequestProperty("Authorization", "Bearer " + token);
             conn.connect();
             int httpResult = conn.getResponseCode();
-            if(httpResult == 200) {
+            if (httpResult == 200) {
                 stringBuilder = readStream(new InputStreamReader(conn.getInputStream()));
                 conn.disconnect();
                 return new NotificationList(stringBuilder.toString());
-            }
-            else{
+            } else {
                 stringBuilder = readStream(new InputStreamReader(conn.getErrorStream(), "utf-8"));
                 throw new NotificationClientException(httpResult, stringBuilder.toString());
             }
@@ -149,14 +156,13 @@ public class NotificationClient implements NotificationClientApi {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
-        }finally {
-            if(conn != null){
+        } finally {
+            if (conn != null) {
                 conn.disconnect();
             }
         }
         return null;
     }
-
 
     private HttpsURLConnection getConnection(URL url) throws IOException {
         HttpsURLConnection conn;
@@ -186,20 +192,35 @@ public class NotificationClient implements NotificationClientApi {
         JSONObject body = new JSONObject();
         body.put("to", to);
         body.put("template", templateId);
-        if(personalisation != null && !personalisation.isEmpty()){
+        if (personalisation != null && !personalisation.isEmpty()) {
             body.put("personalisation", new JSONObject(personalisation));
         }
         return body;
     }
+
     private StringBuilder readStream(InputStreamReader streamReader) throws IOException {
         StringBuilder sb = new StringBuilder();
         BufferedReader br = new BufferedReader(streamReader);
-        String line = null;
+        String line;
         while ((line = br.readLine()) != null) {
-            sb.append(line + "\n");
+            sb.append(line).append("\n");
         }
         br.close();
         return sb;
+    }
+
+    /**
+     * Set default SSL context for HTTPS connections.
+     *
+     * This is necessary when client has to use keystore
+     * (eg provide certification for client authentication).
+     *
+     * Use case: enterprise proxy requiring HTTPS client authentication
+     *
+     * @throws NoSuchAlgorithmException
+     */
+    private static void setDefaultSSLContext() throws NoSuchAlgorithmException {
+        HttpsURLConnection.setDefaultSSLSocketFactory(SSLContext.getDefault().getSocketFactory());
     }
 
 }
