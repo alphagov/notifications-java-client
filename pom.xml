@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>uk.gov.service.notify</groupId>
     <artifactId>notifications-java-client</artifactId>
-    <version>3.9.2-RELEASE</version>
+    <version>3.10.0-RELEASE</version>
     <properties>
        <maven.compiler.source>1.8</maven.compiler.source>
        <maven.compiler.target>1.8</maven.compiler.target>
