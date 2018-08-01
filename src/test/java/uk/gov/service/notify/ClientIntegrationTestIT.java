@@ -141,6 +141,8 @@ public class ClientIntegrationTestIT {
         } catch (NotificationClientException e) {
             assert(e.getMessage().contains("Missing personalisation: name"));
             assert(e.getMessage().contains("Status code: 400"));
+            assertEquals(400, e.getHttpResult());
+            assert(e.getHttpResponse().contains("Missing personalisation: name"));
         }
     }
 
