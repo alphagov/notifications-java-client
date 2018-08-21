@@ -1,3 +1,7 @@
+## 3.10.0-RELEASE
+* Updated `Notification` to have an Optional createdByName. If the notification was sent manually, this will be the name of the sender. If the notification was sent through the API, this will be `Optional.empty()`.
+* New method, `sendPrecompiledLetterWithInputStream`, to send a precompiled letter using an InputStream rather than a file.
+
 ## 3.9.2-RELEASE
 * Updated testEmailNotificationWithoutPersonalisationReturnsErrorMessageIT to only look for the BadRequestError rather than the json "error": BadRequestError
 

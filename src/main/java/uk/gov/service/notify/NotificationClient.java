@@ -1,22 +1,30 @@
 package uk.gov.service.notify;
 
+import org.apache.commons.codec.binary.Base64InputStream;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.http.client.utils.URIBuilder;
+import org.json.JSONObject;
+
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
-import java.io.*;
-import java.net.*;
-import java.nio.charset.StandardCharsets;
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
+import java.net.Proxy;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.http.client.utils.URIBuilder;
-
-import org.json.JSONObject;
 
 public class NotificationClient implements NotificationClientApi {
 
@@ -463,8 +471,7 @@ public class NotificationClient implements NotificationClientApi {
         return prop.getProperty("project.version");
     }
 
-    private LetterResponse sendPrecompiledLetter(String reference, String base64EncodedPDFFile) throws NotificationClientException
-    {
+    private LetterResponse sendPrecompiledLetter(String reference, String base64EncodedPDFFile) throws NotificationClientException {
         if( StringUtils.isBlank(reference) )
         {
             throw new NotificationClientException("reference cannot be null or empty");
@@ -498,32 +505,36 @@ public class NotificationClient implements NotificationClientApi {
     }
 
     @Override
-    public LetterResponse sendPrecompiledLetter(String reference, File precompiledPDF) throws NotificationClientException
-    {
-
+    public LetterResponse sendPrecompiledLetter(String reference, File precompiledPDF) throws NotificationClientException {
         if (precompiledPDF == null)
         {
-            throw new NotificationClientException("precompiledPDF cannot be null");
+            throw new NotificationClientException("File cannot be null");
         }
-
-        if(!PdfUtils.isFilePDF(precompiledPDF))
-        {
-            throw new NotificationClientException("precompiledPDF must be a valid PDF file");
+        byte[] buf;
+        try {
+            buf = FileUtils.readFileToByteArray(precompiledPDF);
+        } catch (IOException e) {
+            throw new NotificationClientException("Can't read file");
         }
-
-        byte[] encoded;
-
-        try
-        {
-            encoded = Base64.encodeBase64(FileUtils.readFileToByteArray(precompiledPDF));
-        }
-        catch (IOException e)
-        {
-            throw new NotificationClientException("Error opening precompiledPDF file for base64 encoding", e);
-        }
-
-        String base64encodedString = new String(encoded, StandardCharsets.US_ASCII);
-
-        return this.sendPrecompiledLetter(reference, base64encodedString);
+        return sendPrecompiledLetterWithInputStream(reference, new ByteArrayInputStream(buf));
     }
+
+    @Override
+    public LetterResponse sendPrecompiledLetterWithInputStream(String reference, InputStream stream) throws NotificationClientException
+    {
+        if (stream == null)
+        {
+            throw new NotificationClientException("Input stream cannot be null");
+        }
+        Base64InputStream base64InputStream = new Base64InputStream(stream, true, 0, null);
+        String encoded;
+        try {
+            encoded = IOUtils.toString(base64InputStream, "ISO-8859-1");
+        } catch (IOException e) {
+            throw new NotificationClientException("Error when turning Base64InputStream into a string");
+        }
+
+        return this.sendPrecompiledLetter(reference, encoded);
+    }
+
 }

@@ -12,29 +12,6 @@ import static org.junit.Assert.*;
 public class PdfUtilsTest
 {
     @Test
-    public void testIsFilePDFValidPdf() throws Exception
-    {
-        ClassLoader classLoader = getClass().getClassLoader();
-        File file = new File(classLoader.getResource("one_page_pdf.pdf").getFile());
-        assertTrue(PdfUtils.isFilePDF(file));
-    }
-
-    @Test
-    public void testIsFilePDFNotValidPdf() throws Exception
-    {
-        ClassLoader classLoader = getClass().getClassLoader();
-        File file = new File(classLoader.getResource("not_a_pdf.txt").getFile());
-        assertFalse(PdfUtils.isFilePDF(file));
-    }
-
-    @Test(expected = NotificationClientException.class)
-    public void testIsFilePDFThrowException() throws Exception
-    {
-        File file = new File("this is a path");
-        PdfUtils.isFilePDF(file);
-    }
-
-    @Test
     public void testIsBase64StringNotValidPdf() throws Exception
     {
         ClassLoader classLoader = getClass().getClassLoader();

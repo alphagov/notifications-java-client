@@ -1,11 +1,10 @@
 package uk.gov.service.notify;
 
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 
 import java.io.File;
-import java.nio.charset.StandardCharsets;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Optional;
@@ -264,6 +263,33 @@ public class ClientIntegrationTestIT {
         testGetReceivedTextMessagesWithOlderThanId(receivedTextMessage.getId(), client);
     }
 
+    @Test
+    public void testSendPrecompiledLetterValidPDFFileIT() throws Exception {
+        String reference = UUID.randomUUID().toString();
+
+        ClassLoader classLoader = getClass().getClassLoader();
+        File file = new File(classLoader.getResource("one_page_pdf.pdf").getFile());
+        NotificationClient client = getClient();
+        LetterResponse response =  client.sendPrecompiledLetter(reference, file);
+
+        assertPrecompiledLetterResponse(reference, response);
+
+    }
+
+    @Test
+    public void testSendPrecompiledLetterWithInputStream() throws Exception {
+        String reference = UUID.randomUUID().toString();
+
+        ClassLoader classLoader = getClass().getClassLoader();
+        File file = new File(classLoader.getResource("one_page_pdf.pdf").getFile());
+        InputStream stream = new FileInputStream(file);
+        NotificationClient client = getClient();
+        LetterResponse response =  client.sendPrecompiledLetterWithInputStream(reference, stream);
+
+        assertPrecompiledLetterResponse(reference, response);
+
+    }
+
     private ReceivedTextMessage assertReceivedTextMessageList(ReceivedTextMessageList response) {
         assertFalse(response.getReceivedTextMessages().isEmpty());
         assertNotNull(response.getCurrentPageLink());
@@ -369,6 +395,7 @@ public class ClientIntegrationTestIT {
         assertNotNull(notification.getCreatedAt());
         assertNotNull(notification.getStatus());
         assertNotNull(notification.getNotificationType());
+        assertFalse(notification.getCreatedByName().isPresent());
         if(notification.getNotificationType().equals("sms")) {
             assertNotificationWhenSms(notification);
         }
@@ -421,19 +448,6 @@ public class ClientIntegrationTestIT {
         assertFalse(notification.getLine5().isPresent());
         assertFalse(notification.getLine6().isPresent());
         assertFalse(notification.getPostcode().isPresent());
-    }
-
-    @Test
-    public void testSendPrecompiledLetterValidPDFFileIT() throws Exception {
-        String reference = UUID.randomUUID().toString();
-
-        ClassLoader classLoader = getClass().getClassLoader();
-        File file = new File(classLoader.getResource("one_page_pdf.pdf").getFile());
-        NotificationClient client = getClient();
-        LetterResponse response =  client.sendPrecompiledLetter(reference, file);
-
-        assertPrecompiledLetterResponse(reference, response);
-
     }
 
     private void assertPrecompiledLetterResponse(String reference, LetterResponse response) {
