@@ -1,4 +1,4 @@
-# GOV.UK Notify Java client
+# GOV.UK Notify Java client [![Build Status](https://travis-ci.org/alphagov/notifications-java-client.svg?branch=master)](https://travis-ci.org/alphagov/notifications-java-client)
 
 Use this client to send emails, text messages and letters using the [GOV.UK Notify](https://www.notifications.service.gov.uk) API.
 
