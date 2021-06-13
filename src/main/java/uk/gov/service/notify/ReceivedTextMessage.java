@@ -1,8 +1,8 @@
 package uk.gov.service.notify;
 
-import org.joda.time.DateTime;
 import org.json.JSONObject;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 public class ReceivedTextMessage {
@@ -11,7 +11,7 @@ public class ReceivedTextMessage {
     private String userNumber;
     private UUID serviceId;
     private String content;
-    private DateTime createdAt;
+    private LocalDateTime createdAt;
 
     public ReceivedTextMessage(String json){
         JSONObject responseBodyAsJson = new JSONObject(json);
@@ -29,7 +29,7 @@ public class ReceivedTextMessage {
         userNumber = data.getString("user_number");
         serviceId = UUID.fromString(data.getString("service_id"));
         content = data.getString("content");
-        createdAt = new DateTime(data.getString("created_at"));
+        createdAt = LocalDateTime.parse(data.getString("created_at"), DateUtils.DATE_TIME_FORMATTER);
     }
 
 
@@ -53,7 +53,7 @@ public class ReceivedTextMessage {
         return content;
     }
 
-    public DateTime getCreatedAt() {
+    public LocalDateTime getCreatedAt() {
         return createdAt;
     }
 }

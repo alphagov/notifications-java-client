@@ -1,8 +1,8 @@
 package uk.gov.service.notify;
 
-import org.joda.time.DateTime;
 import org.json.JSONObject;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.Map;
@@ -11,8 +11,8 @@ public class Template {
     private UUID id;
     private String name;
     private String templateType;
-    private DateTime createdAt;
-    private DateTime updatedAt;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
     private String createdBy;
     private int version;
     private String body;
@@ -36,8 +36,8 @@ public class Template {
         id = UUID.fromString(data.getString("id"));
         name = data.getString("name");
         templateType = data.getString("type");
-        createdAt = new DateTime(data.getString("created_at"));
-        updatedAt = data.isNull("updated_at") ? null : new DateTime(data.getString("updated_at"));
+        createdAt = LocalDateTime.parse(data.getString("created_at"), DateUtils.DATE_TIME_FORMATTER);
+        updatedAt = data.isNull("updated_at") ? null : LocalDateTime.parse(data.getString("updated_at"), DateUtils.DATE_TIME_FORMATTER);
         version = data.getInt("version");
         body = data.getString("body");
         subject = data.isNull("subject") ? null : data.getString("subject");
@@ -70,19 +70,19 @@ public class Template {
         this.name = name;
     }
 
-    public DateTime getCreatedAt() {
+    public LocalDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(DateTime createdAt) {
+    public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
 
-    public Optional<DateTime> getUpdatedAt() {
+    public Optional<LocalDateTime> getUpdatedAt() {
         return Optional.ofNullable(updatedAt);
     }
 
-    public void setUpdatedAt(DateTime updatedAt) {
+    public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }
 

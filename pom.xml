@@ -4,7 +4,7 @@
     
     <groupId>uk.gov.service.notify</groupId>
     <artifactId>notifications-java-client</artifactId>
-    <version>3.17.2-RELEASE</version>
+    <version>3.17.3-RELEASE</version>
     <packaging>jar</packaging>
     
     <name>GOV.UK Notify Java client</name>
@@ -66,11 +66,6 @@
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
             <version>20210307</version>
-        </dependency>
-        <dependency>
-            <groupId>joda-time</groupId>
-            <artifactId>joda-time</artifactId>
-            <version>2.10.10</version>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>

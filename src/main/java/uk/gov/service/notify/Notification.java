@@ -1,8 +1,8 @@
 package uk.gov.service.notify;
 
-import org.joda.time.DateTime;
 import org.json.JSONObject;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -26,10 +26,10 @@ public class Notification {
     private String templateUri;
     private String body;
     private String subject;
-    private DateTime createdAt;
-    private DateTime sentAt;
-    private DateTime completedAt;
-    private DateTime estimatedDelivery;
+    private LocalDateTime createdAt;
+    private LocalDateTime sentAt;
+    private LocalDateTime completedAt;
+    private LocalDateTime estimatedDelivery;
     private String createdByName;
 
     public Notification(String content){
@@ -62,10 +62,10 @@ public class Notification {
         body = data.getString("body");
         subject = data.isNull("subject") ? null : data.getString("subject");
         status = data.getString("status");
-        createdAt = new DateTime(data.getString("created_at"));
-        sentAt =  data.isNull("sent_at") ? null : new DateTime(data.getString("sent_at"));
-        completedAt = data.isNull("completed_at") ? null : new DateTime(data.getString("completed_at"));
-        estimatedDelivery = data.isNull("estimated_delivery") ? null : new DateTime(data.getString("estimated_delivery"));
+        createdAt = LocalDateTime.parse(data.getString("created_at"), DateUtils.DATE_TIME_FORMATTER);
+        sentAt =  data.isNull("sent_at") ? null : LocalDateTime.parse(data.getString("sent_at"), DateUtils.DATE_TIME_FORMATTER);
+        completedAt = data.isNull("completed_at") ? null : LocalDateTime.parse(data.getString("completed_at"), DateUtils.DATE_TIME_FORMATTER);
+        estimatedDelivery = data.isNull("estimated_delivery") ? null : LocalDateTime.parse(data.getString("estimated_delivery"), DateUtils.DATE_TIME_FORMATTER);
         createdByName = data.isNull("created_by_name") ? null : data.getString("created_by_name");
     }
 
@@ -144,15 +144,15 @@ public class Notification {
         return Optional.ofNullable(subject);
     }
 
-    public DateTime getCreatedAt() {
+    public LocalDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public Optional<DateTime> getSentAt() {
+    public Optional<LocalDateTime> getSentAt() {
         return Optional.ofNullable(sentAt);
     }
 
-    public Optional<DateTime> getCompletedAt() {
+    public Optional<LocalDateTime> getCompletedAt() {
         return Optional.ofNullable(completedAt);
     }
 
@@ -163,7 +163,7 @@ public class Notification {
     /**
      * estimatedDelivery is only present on letters
      */
-    public Optional<DateTime> getEstimatedDelivery() {
+    public Optional<LocalDateTime> getEstimatedDelivery() {
         return Optional.ofNullable(estimatedDelivery);
     }
 

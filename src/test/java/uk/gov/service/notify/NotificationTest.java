@@ -1,9 +1,9 @@
 package uk.gov.service.notify;
 
-import org.joda.time.DateTime;
 import org.jose4j.json.internal.json_simple.JSONObject;
 import org.junit.Test;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -62,10 +62,10 @@ public class NotificationTest {
         assertEquals("https://api.notifications.service.gov.uk/templates/" + templateId, notification.getTemplateUri());
         assertEquals("Body of the message", notification.getBody());
         assertEquals(Optional.of("Subject of the message"), notification.getSubject());
-        assertEquals(new DateTime("2016-03-01T08:30:00.000Z"), notification.getCreatedAt());
-        assertEquals(Optional.of(new DateTime("2016-03-01T08:30:03.000Z")), notification.getSentAt());
-        assertEquals(Optional.of(new DateTime("2016-03-01T08:30:43.000Z")), notification.getCompletedAt());
-        assertEquals(Optional.of(new DateTime("2016-03-03T16:00:00.000Z")), notification.getEstimatedDelivery());
+        assertEquals(LocalDateTime.parse("2016-03-01T08:30:00.000Z", DateUtils.DATE_TIME_FORMATTER), notification.getCreatedAt());
+        assertEquals(Optional.of(LocalDateTime.parse("2016-03-01T08:30:03.000Z", DateUtils.DATE_TIME_FORMATTER)), notification.getSentAt());
+        assertEquals(Optional.of(LocalDateTime.parse("2016-03-01T08:30:43.000Z", DateUtils.DATE_TIME_FORMATTER)), notification.getCompletedAt());
+        assertEquals(Optional.of(LocalDateTime.parse("2016-03-03T16:00:00.000Z", DateUtils.DATE_TIME_FORMATTER)), notification.getEstimatedDelivery());
         assertEquals(Optional.of("John Doe"), notification.getCreatedByName());
 
     }
@@ -123,10 +123,10 @@ public class NotificationTest {
         assertEquals("https://api.notifications.service.gov.uk/templates/" + templateId, notification.getTemplateUri());
         assertEquals("Body of the message", notification.getBody());
         assertEquals(Optional.empty(), notification.getSubject());
-        assertEquals(new DateTime("2016-03-01T08:30:00.000Z"), notification.getCreatedAt());
-        assertEquals(Optional.of(new DateTime("2016-03-01T08:30:03.000Z")), notification.getSentAt());
-        assertEquals(Optional.of(new DateTime("2016-03-01T08:30:43.000Z")), notification.getCompletedAt());
-        assertEquals(Optional.of(new DateTime("2016-03-03T16:00:00.000Z")), notification.getEstimatedDelivery());
+        assertEquals(LocalDateTime.parse("2016-03-01T08:30:00.000Z", DateUtils.DATE_TIME_FORMATTER), notification.getCreatedAt());
+        assertEquals(Optional.of(LocalDateTime.parse("2016-03-01T08:30:03.000Z", DateUtils.DATE_TIME_FORMATTER)), notification.getSentAt());
+        assertEquals(Optional.of(LocalDateTime.parse("2016-03-01T08:30:43.000Z", DateUtils.DATE_TIME_FORMATTER)), notification.getCompletedAt());
+        assertEquals(Optional.of(LocalDateTime.parse("2016-03-03T16:00:00.000Z", DateUtils.DATE_TIME_FORMATTER)), notification.getEstimatedDelivery());
         assertEquals(Optional.of("John Doe"), notification.getCreatedByName());
 
     }
@@ -185,10 +185,10 @@ public class NotificationTest {
         assertEquals("https://api.notifications.service.gov.uk/templates/" + templateId, notification.getTemplateUri());
         assertEquals("Body of the message", notification.getBody());
         assertEquals(Optional.empty(), notification.getSubject());
-        assertEquals(new DateTime("2016-03-01T08:30:00.000Z"), notification.getCreatedAt());
-        assertEquals(Optional.of(new DateTime("2016-03-01T08:30:03.000Z")), notification.getSentAt());
-        assertEquals(Optional.of(new DateTime("2016-03-01T08:30:43.000Z")), notification.getCompletedAt());
-        assertEquals(Optional.of(new DateTime("2016-03-03T16:00:00.000Z")), notification.getEstimatedDelivery());
+        assertEquals(LocalDateTime.parse("2016-03-01T08:30:00.000Z", DateUtils.DATE_TIME_FORMATTER), notification.getCreatedAt());
+        assertEquals(Optional.of(LocalDateTime.parse("2016-03-01T08:30:03.000Z", DateUtils.DATE_TIME_FORMATTER)), notification.getSentAt());
+        assertEquals(Optional.of(LocalDateTime.parse("2016-03-01T08:30:43.000Z", DateUtils.DATE_TIME_FORMATTER)), notification.getCompletedAt());
+        assertEquals(Optional.of(LocalDateTime.parse("2016-03-03T16:00:00.000Z", DateUtils.DATE_TIME_FORMATTER)), notification.getEstimatedDelivery());
         assertEquals(Optional.of("John Doe"), notification.getCreatedByName());
     }
 }
