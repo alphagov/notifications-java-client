@@ -3,7 +3,7 @@ package uk.gov.service.notify;
 import org.jose4j.json.internal.json_simple.JSONObject;
 import org.junit.Test;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
@@ -28,6 +28,6 @@ public class ReceivedTextMessageTest {
         assertEquals("447700900000", receivedTextMessage.getUserNumber());
         assertEquals(UUID.fromString(serviceId), receivedTextMessage.getServiceId());
         assertEquals("Content of the message from the user", receivedTextMessage.getContent());
-        assertEquals(LocalDateTime.parse("2016-03-01T08:30:00.000Z", DateUtils.DATE_TIME_FORMATTER), receivedTextMessage.getCreatedAt());
+        assertEquals(ZonedDateTime.parse("2016-03-01T08:30:00.000Z", DateUtils.DATE_TIME_FORMATTER), receivedTextMessage.getCreatedAt());
     }
 }

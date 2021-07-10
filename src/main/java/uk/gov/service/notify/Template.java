@@ -2,7 +2,7 @@ package uk.gov.service.notify;
 
 import org.json.JSONObject;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.Map;
@@ -11,8 +11,8 @@ public class Template {
     private UUID id;
     private String name;
     private String templateType;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+    private ZonedDateTime createdAt;
+    private ZonedDateTime updatedAt;
     private String createdBy;
     private int version;
     private String body;
@@ -36,8 +36,8 @@ public class Template {
         id = UUID.fromString(data.getString("id"));
         name = data.getString("name");
         templateType = data.getString("type");
-        createdAt = LocalDateTime.parse(data.getString("created_at"), DateUtils.DATE_TIME_FORMATTER);
-        updatedAt = data.isNull("updated_at") ? null : LocalDateTime.parse(data.getString("updated_at"), DateUtils.DATE_TIME_FORMATTER);
+        createdAt = ZonedDateTime.parse(data.getString("created_at"), DateUtils.DATE_TIME_FORMATTER);
+        updatedAt = data.isNull("updated_at") ? null : ZonedDateTime.parse(data.getString("updated_at"), DateUtils.DATE_TIME_FORMATTER);
         version = data.getInt("version");
         body = data.getString("body");
         subject = data.isNull("subject") ? null : data.getString("subject");
@@ -70,19 +70,19 @@ public class Template {
         this.name = name;
     }
 
-    public LocalDateTime getCreatedAt() {
+    public ZonedDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
+    public void setCreatedAt(ZonedDateTime createdAt) {
         this.createdAt = createdAt;
     }
 
-    public Optional<LocalDateTime> getUpdatedAt() {
+    public Optional<ZonedDateTime> getUpdatedAt() {
         return Optional.ofNullable(updatedAt);
     }
 
-    public void setUpdatedAt(LocalDateTime updatedAt) {
+    public void setUpdatedAt(ZonedDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }
 

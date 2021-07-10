@@ -3,7 +3,7 @@ package uk.gov.service.notify;
 import org.jose4j.json.internal.json_simple.JSONObject;
 import org.junit.Test;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -39,8 +39,8 @@ public class TemplateTest {
         assertEquals(UUID.fromString(id), template.getId());
         assertEquals("my template", template.getName());
         assertEquals("email", template.getTemplateType());
-        assertEquals(LocalDateTime.parse("2017-05-01T08:30:00.000Z", DateUtils.DATE_TIME_FORMATTER), template.getCreatedAt());
-        assertEquals(Optional.of(LocalDateTime.parse("2017-05-01T08:34:00.000Z", DateUtils.DATE_TIME_FORMATTER)), template.getUpdatedAt());
+        assertEquals(ZonedDateTime.parse("2017-05-01T08:30:00.000Z", DateUtils.DATE_TIME_FORMATTER), template.getCreatedAt());
+        assertEquals(Optional.of(ZonedDateTime.parse("2017-05-01T08:34:00.000Z", DateUtils.DATE_TIME_FORMATTER)), template.getUpdatedAt());
         assertEquals(3, template.getVersion());
         assertEquals("The body of the template. For ((name)) eyes only.", template.getBody());
         assertEquals(Optional.of("Private email"), template.getSubject());
@@ -74,7 +74,7 @@ public class TemplateTest {
         assertEquals(UUID.fromString(id), template.getId());
         assertEquals("my template", template.getName());
         assertEquals("email", template.getTemplateType());
-        assertEquals(LocalDateTime.parse("2017-05-01T08:30:00.000Z", DateUtils.DATE_TIME_FORMATTER), template.getCreatedAt());
+        assertEquals(ZonedDateTime.parse("2017-05-01T08:30:00.000Z", DateUtils.DATE_TIME_FORMATTER), template.getCreatedAt());
         assertEquals(Optional.empty(), template.getUpdatedAt());
         assertEquals(3, template.getVersion());
         assertEquals("The body of the template. For ((name)) eyes only.", template.getBody());

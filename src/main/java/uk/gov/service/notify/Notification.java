@@ -2,7 +2,7 @@ package uk.gov.service.notify;
 
 import org.json.JSONObject;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -26,10 +26,10 @@ public class Notification {
     private String templateUri;
     private String body;
     private String subject;
-    private LocalDateTime createdAt;
-    private LocalDateTime sentAt;
-    private LocalDateTime completedAt;
-    private LocalDateTime estimatedDelivery;
+    private ZonedDateTime createdAt;
+    private ZonedDateTime sentAt;
+    private ZonedDateTime completedAt;
+    private ZonedDateTime estimatedDelivery;
     private String createdByName;
 
     public Notification(String content){
@@ -62,10 +62,10 @@ public class Notification {
         body = data.getString("body");
         subject = data.isNull("subject") ? null : data.getString("subject");
         status = data.getString("status");
-        createdAt = LocalDateTime.parse(data.getString("created_at"), DateUtils.DATE_TIME_FORMATTER);
-        sentAt =  data.isNull("sent_at") ? null : LocalDateTime.parse(data.getString("sent_at"), DateUtils.DATE_TIME_FORMATTER);
-        completedAt = data.isNull("completed_at") ? null : LocalDateTime.parse(data.getString("completed_at"), DateUtils.DATE_TIME_FORMATTER);
-        estimatedDelivery = data.isNull("estimated_delivery") ? null : LocalDateTime.parse(data.getString("estimated_delivery"), DateUtils.DATE_TIME_FORMATTER);
+        createdAt = ZonedDateTime.parse(data.getString("created_at"), DateUtils.DATE_TIME_FORMATTER);
+        sentAt =  data.isNull("sent_at") ? null : ZonedDateTime.parse(data.getString("sent_at"), DateUtils.DATE_TIME_FORMATTER);
+        completedAt = data.isNull("completed_at") ? null : ZonedDateTime.parse(data.getString("completed_at"), DateUtils.DATE_TIME_FORMATTER);
+        estimatedDelivery = data.isNull("estimated_delivery") ? null : ZonedDateTime.parse(data.getString("estimated_delivery"), DateUtils.DATE_TIME_FORMATTER);
         createdByName = data.isNull("created_by_name") ? null : data.getString("created_by_name");
     }
 
@@ -144,15 +144,15 @@ public class Notification {
         return Optional.ofNullable(subject);
     }
 
-    public LocalDateTime getCreatedAt() {
+    public ZonedDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public Optional<LocalDateTime> getSentAt() {
+    public Optional<ZonedDateTime> getSentAt() {
         return Optional.ofNullable(sentAt);
     }
 
-    public Optional<LocalDateTime> getCompletedAt() {
+    public Optional<ZonedDateTime> getCompletedAt() {
         return Optional.ofNullable(completedAt);
     }
 
@@ -163,7 +163,7 @@ public class Notification {
     /**
      * estimatedDelivery is only present on letters
      */
-    public Optional<LocalDateTime> getEstimatedDelivery() {
+    public Optional<ZonedDateTime> getEstimatedDelivery() {
         return Optional.ofNullable(estimatedDelivery);
     }
 
