@@ -591,10 +591,10 @@ int templateVersion;
 String templateUri;
 String body;
 Optional<String subject;
-DateTime createdAt;
-Optional<DateTime> sentAt;
-Optional<DateTime> completedAt;
-Optional<DateTime> estimatedDelivery;
+ZonedDateTime createdAt;
+Optional<ZonedDateTime> sentAt;
+Optional<ZonedDateTime> completedAt;
+Optional<ZonedDateTime> estimatedDelivery;
 Optional<String> createdByName;
 ```
 
@@ -809,8 +809,8 @@ If the request to the client is successful, the client returns a `Template`:
 UUID id;
 String name;
 String templateType;
-DateTime createdAt;
-Optional<DateTime> updatedAt;
+ZonedDateTime createdAt;
+Optional<ZonedDateTime> updatedAt;
 String createdBy;
 int version;
 String body;
@@ -860,8 +860,8 @@ If the request to the client is successful, the client returns a `Template`:
 UUID id;
 String name;
 String templateType;
-DateTime createdAt;
-Optional<DateTime> updatedAt;
+ZonedDateTime createdAt;
+Optional<ZonedDateTime> updatedAt;
 String createdBy;
 int version;
 String body;
@@ -1026,7 +1026,7 @@ private String notifyNumber;
 private String userNumber;
 private UUID serviceId;
 private String content;
-private DateTime createdAt;
+private ZonedDateTime createdAt;
 ```
 If the notification specified in the `olderThanId` argument is older than 7 days, the client returns an empty response.
 
