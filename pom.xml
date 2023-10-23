@@ -4,7 +4,7 @@
 
     <groupId>uk.gov.service.notify</groupId>
     <artifactId>notifications-java-client</artifactId>
-    <version>4.1.0-RELEASE</version>
+    <version>4.1.1-RELEASE</version>
     <packaging>jar</packaging>
 
     <name>GOV.UK Notify Java client</name>
@@ -60,7 +60,7 @@
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
-            <version>20230227</version>
+            <version>20231013</version>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
