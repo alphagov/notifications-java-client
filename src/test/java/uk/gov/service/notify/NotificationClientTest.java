@@ -41,6 +41,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.time.temporal.ChronoUnit;
@@ -48,6 +49,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.created;
@@ -320,7 +322,7 @@ public class NotificationClientTest {
     }
 
     @Test
-    public void testSendEmail() throws NotificationClientException, IOException {
+    public void testSendEmailWithoutUnsubscribeURL() throws NotificationClientException, IOException {
         NotifyEmailResponse expected = objectMapper.readValue(this.getClass().getClassLoader().getResourceAsStream("v2_notifications_email_response.json"), NotifyEmailResponse.class);
         wireMockRule.stubFor(post("/v2/notifications/email")
                 .willReturn(created()
@@ -342,6 +344,7 @@ public class NotificationClientTest {
         assertEquals(expected.getTemplate().getId(), actual.getTemplateId());
         assertEquals(expected.getTemplate().getVersion(), actual.getTemplateVersion());
         assertEquals(expected.getTemplate().getUri().toString(), actual.getTemplateUri());
+        assertEquals(Optional.empty(), actual.getOneClickUnsubscribeURL());
 
         LoggedRequest request = validateRequest();
         NotifyEmailRequest requestReceivedByNotifyApi = objectMapper.readValue(request.getBodyAsString(), NotifyEmailRequest.class);
@@ -350,6 +353,43 @@ public class NotificationClientTest {
         assertEquals(personalisation, requestReceivedByNotifyApi.getPersonalisation());
         assertEquals("aReference", requestReceivedByNotifyApi.getReference());
         assertEquals("an emailReplyToId", requestReceivedByNotifyApi.getEmailReplyToId());
+        assertNull(requestReceivedByNotifyApi.getOneClickUnsubscribeURL());
+    }
+
+    @Test
+    public void testSendEmailWithUnsubscribeURL() throws NotificationClientException, IOException {
+        NotifyEmailResponse expected = objectMapper.readValue(this.getClass().getClassLoader().getResourceAsStream("v2_notifications_email_unsubscribe_response.json"), NotifyEmailResponse.class);
+        wireMockRule.stubFor(post("/v2/notifications/email")
+                .willReturn(created()
+                        .withResponseBody(new Body(objectMapper.writeValueAsString(expected)))));
+        NotificationClient client = new NotificationClient(COMBINED_API_KEY, BASE_URL);
+        // setting up this map can be replaced with Map.of() in later Java versions
+        Map<String, Object> personalisation = new HashMap<>();
+        personalisation.put("application_date", "2018-01-01");
+        URI oneClickUnsubscribeURL = URI.create("http://localhost/unsubscribe");
+
+        SendEmailResponse actual = client.sendEmail("aTemplateId", "anEmailAddress", personalisation, "aReference", "an emailReplyToId", oneClickUnsubscribeURL);
+
+        assertEquals(expected.getNotificationId(), actual.getNotificationId());
+        assertEquals(expected.getReference(), actual.getReference().get());
+        assertEquals(expected.getContent().getBody(), actual.getBody());
+        assertEquals(expected.getContent().getSubject(), actual.getSubject());
+        assertEquals(expected.getContent().getFromEmail(), actual.getFromEmail().get());
+        // No notification uri in SendEmailResponse?
+//        assertEquals(expected.getUri(), actual.getUri());
+        assertEquals(expected.getTemplate().getId(), actual.getTemplateId());
+        assertEquals(expected.getTemplate().getVersion(), actual.getTemplateVersion());
+        assertEquals(expected.getTemplate().getUri().toString(), actual.getTemplateUri());
+        assertEquals(expected.getOneClickUnsubscribeURL(), actual.getOneClickUnsubscribeURL().get());
+
+        LoggedRequest request = validateRequest();
+        NotifyEmailRequest requestReceivedByNotifyApi = objectMapper.readValue(request.getBodyAsString(), NotifyEmailRequest.class);
+        assertEquals("anEmailAddress", requestReceivedByNotifyApi.getEmailAddress());
+        assertEquals("aTemplateId", requestReceivedByNotifyApi.getTemplateId());
+        assertEquals(personalisation, requestReceivedByNotifyApi.getPersonalisation());
+        assertEquals("aReference", requestReceivedByNotifyApi.getReference());
+        assertEquals("an emailReplyToId", requestReceivedByNotifyApi.getEmailReplyToId());
+        assertEquals(oneClickUnsubscribeURL, requestReceivedByNotifyApi.getOneClickUnsubscribeURL());
     }
 
     @Test

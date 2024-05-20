@@ -1,0 +1,16 @@
+{
+  "id": "7dd0b55b-fca1-496f-b52a-787692045f71",
+  "reference": "a reference",
+  "content": {
+    "body": "a content`body",
+    "subject": "a subject",
+    "from_email": "a from email"
+  },
+  "uri": null,
+  "template": {
+    "id": "cc378915-2e6c-4e04-86a7-5f71949582b7",
+    "version": -1,
+    "uri": "http://localhost"
+  },
+  "one_click_unsubscribe_url": "http://localhost"
+}

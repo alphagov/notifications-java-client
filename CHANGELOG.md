@@ -1,3 +1,6 @@
+## 5.1.0-RELEASE
+* Add a `oneClickUnsubscribeURL` parameter to `sendEmail`. The unsubscribe URL will be added to the headers of your email. Email clients will use it to add an unsubscribe button.  See https://www.notifications.service.gov.uk/using-notify/unsubscribe-links
+
 ## 5.0.1-RELEASE
 * Bump jose4j from 0.9.3 to 0.9.6
 

@@ -2,6 +2,7 @@ package uk.gov.service.notify;
 
 import org.json.JSONObject;
 
+import java.net.URI;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -14,7 +15,7 @@ public class SendEmailResponse {
     private final String body;
     private final String subject;
     private final String fromEmail;
-
+    private final URI oneClickUnsubscribeURL;
 
     public SendEmailResponse(String response) {
         JSONObject data = new JSONObject(response);
@@ -28,6 +29,7 @@ public class SendEmailResponse {
         templateId = UUID.fromString(template.getString("id"));
         templateVersion = template.getInt("version");
         templateUri = template.getString("uri");
+        oneClickUnsubscribeURL = data.isNull("one_click_unsubscribe_url") ? null : URI.create(data.getString("one_click_unsubscribe_url"));
     }
 
     public UUID getNotificationId() {
@@ -62,17 +64,22 @@ public class SendEmailResponse {
         return Optional.ofNullable(fromEmail);
     }
 
+    public Optional<URI> getOneClickUnsubscribeURL() {
+        return Optional.ofNullable(oneClickUnsubscribeURL);
+    }
+
     @Override
     public String toString() {
         return "SendEmailResponse{" +
                 "notificationId=" + notificationId +
-                ", reference=" + reference +
+                ", reference='" + reference + '\'' +
                 ", templateId=" + templateId +
                 ", templateVersion=" + templateVersion +
                 ", templateUri='" + templateUri + '\'' +
                 ", body='" + body + '\'' +
                 ", subject='" + subject + '\'' +
-                ", fromEmail=" + fromEmail +
+                ", fromEmail='" + fromEmail + '\'' +
+                ", oneClickUnsubscribeURL=" + oneClickUnsubscribeURL +
                 '}';
     }
 }

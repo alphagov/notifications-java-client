@@ -16,6 +16,7 @@ import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.Proxy;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.security.NoSuchAlgorithmException;
@@ -137,7 +138,7 @@ public class NotificationClient implements NotificationClientApi {
                                        String emailAddress,
                                        Map<String, ?> personalisation,
                                        String reference) throws NotificationClientException {
-        return sendEmail(templateId, emailAddress, personalisation, reference, "");
+        return sendEmail(templateId, emailAddress, personalisation, reference, "", null);
     }
 
     @Override
@@ -146,6 +147,16 @@ public class NotificationClient implements NotificationClientApi {
                                        Map<String, ?> personalisation,
                                        String reference,
                                        String emailReplyToId) throws NotificationClientException {
+        return sendEmail(templateId, emailAddress, personalisation, reference, emailReplyToId, null);
+    }
+
+    @Override
+    public SendEmailResponse sendEmail(String templateId,
+                                       String emailAddress,
+                                       Map<String, ?> personalisation,
+                                       String reference,
+                                       String emailReplyToId,
+                                       URI oneClickUnsubscribeURL) throws NotificationClientException {
 
         JSONObject body = createBodyForPostRequest(templateId,
                 null,
@@ -158,6 +169,11 @@ public class NotificationClient implements NotificationClientApi {
         if(emailReplyToId != null && !emailReplyToId.isEmpty())
         {
             body.put("email_reply_to_id", emailReplyToId);
+        }
+
+        if(oneClickUnsubscribeURL != null)
+        {
+            body.put("one_click_unsubscribe_url", oneClickUnsubscribeURL);
         }
 
         HttpURLConnection conn = createConnectionAndSetHeaders(baseUrl + "/v2/notifications/email", "POST");
