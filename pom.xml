@@ -4,7 +4,7 @@
 
     <groupId>uk.gov.service.notify</groupId>
     <artifactId>notifications-java-client</artifactId>
-    <version>5.1.0-RELEASE</version>
+    <version>5.0.1-RELEASE</version>
     <packaging>jar</packaging>
 
     <name>GOV.UK Notify Java client</name>
