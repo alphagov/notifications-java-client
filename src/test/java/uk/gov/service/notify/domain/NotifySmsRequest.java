@@ -4,19 +4,20 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
 
 public class NotifySmsRequest {
     private final String phoneNumber;
-    private final String templateId;
+    private final UUID templateId;
     private final Map<String, ?> personalisation;
     private final String reference;
-    private final String smsSenderId;
+    private final UUID smsSenderId;
 
     public NotifySmsRequest(@JsonProperty("phone_number") String phoneNumber,
-                            @JsonProperty("template_id") String templateId,
+                            @JsonProperty("template_id") UUID templateId,
                             @JsonProperty("personalisation") Map<String, ?> personalisation,
                             @JsonProperty("reference") String reference,
-                            @JsonProperty("sms_sender_id") String smsSenderId) {
+                            @JsonProperty("sms_sender_id") UUID smsSenderId) {
         this.phoneNumber = phoneNumber;
         this.templateId = templateId;
         this.personalisation = personalisation;
@@ -30,7 +31,7 @@ public class NotifySmsRequest {
     }
 
     @JsonProperty("temnplate_id")
-    public String getTemplateId() {
+    public UUID getTemplateId() {
         return templateId;
     }
 
@@ -45,7 +46,7 @@ public class NotifySmsRequest {
     }
 
     @JsonProperty("sms_sender_id")
-    public String getSmsSenderId() {
+    public UUID getSmsSenderId() {
         return smsSenderId;
     }
 

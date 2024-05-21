@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.Map;
+import java.util.UUID;
 
 public interface NotificationClientApi {
 
@@ -21,7 +22,7 @@ public interface NotificationClientApi {
      * @return <code>SendEmailResponse</code>
      * @throws NotificationClientException see https://docs.notifications.service.gov.uk/java.html#send-an-email-error-codes
      */
-    SendEmailResponse sendEmail(String templateId, String emailAddress, Map<String, ?> personalisation, String reference) throws NotificationClientException;
+    SendEmailResponse sendEmail(UUID templateId, String emailAddress, Map<String, ?> personalisation, String reference) throws NotificationClientException;
 
 
     /**
@@ -40,7 +41,7 @@ public interface NotificationClientApi {
      * @return <code>SendEmailResponse</code>
      * @throws NotificationClientException see https://docs.notifications.service.gov.uk/java.html#send-an-email-error-codes
      */
-    SendEmailResponse sendEmail(String templateId, String emailAddress, Map<String, ?> personalisation, String reference, String emailReplyToId) throws NotificationClientException;
+    SendEmailResponse sendEmail(UUID templateId, String emailAddress, Map<String, ?> personalisation, String reference, UUID emailReplyToId) throws NotificationClientException;
 
     /**
      * The sendEmail method will create an HTTPS POST request. A JWT token will be created and added as an Authorization header to the request.
@@ -59,7 +60,7 @@ public interface NotificationClientApi {
      * @return <code>SendEmailResponse</code>
      * @throws NotificationClientException see https://docs.notifications.service.gov.uk/java.html#send-an-email-error-codes
      */
-    SendEmailResponse sendEmail(String templateId, String emailAddress, Map<String, ?> personalisation, String reference, String emailReplyToId, URI oneClickUnsubscribeURL) throws NotificationClientException;
+    SendEmailResponse sendEmail(UUID templateId, String emailAddress, Map<String, ?> personalisation, String reference, UUID emailReplyToId, URI oneClickUnsubscribeURL) throws NotificationClientException;
 
     /**
      * The sendSms method will create an HTTPS POST request. A JWT token will be created and added as an Authorization header to the request.
@@ -74,7 +75,7 @@ public interface NotificationClientApi {
      * @return <code>SendSmsResponse</code>
      * @throws NotificationClientException see https://docs.notifications.service.gov.uk/java.html#error-codes
      */
-    SendSmsResponse sendSms(String templateId, String phoneNumber, Map<String, ?> personalisation, String reference) throws NotificationClientException;
+    SendSmsResponse sendSms(UUID templateId, String phoneNumber, Map<String, ?> personalisation, String reference) throws NotificationClientException;
 
     /**
      * The sendSms method will create an HTTPS POST request. A JWT token will be created and added as an Authorization header to the request.
@@ -92,7 +93,7 @@ public interface NotificationClientApi {
      * @return <code>SendSmsResponse</code>
      * @throws NotificationClientException see https://docs.notifications.service.gov.uk/java.html#error-codes
      */
-    SendSmsResponse sendSms(String templateId, String phoneNumber, Map<String, ?> personalisation, String reference, String smsSenderId) throws NotificationClientException;
+    SendSmsResponse sendSms(UUID templateId, String phoneNumber, Map<String, ?> personalisation, String reference, UUID smsSenderId) throws NotificationClientException;
 
     /**
      * The sendLetter method will create an HTTPS POST request. A JWT token will be created and added as an Authorization header to the request.
@@ -106,7 +107,7 @@ public interface NotificationClientApi {
      * @return <code>SendLetterResponse</code>
      * @throws NotificationClientException see https://docs.notifications.service.gov.uk/java.html#send-a-letter-error-codes
      */
-    SendLetterResponse sendLetter(String templateId, Map<String, ?> personalisation, String reference) throws NotificationClientException;
+    SendLetterResponse sendLetter(UUID templateId, Map<String, ?> personalisation, String reference) throws NotificationClientException;
 
     /**
      * The sendPrecompiledLetter method will create an HTTPS POST request. A JWT token will be created and added as an Authorization header to the request.
@@ -177,7 +178,7 @@ public interface NotificationClientApi {
      * @return <code>Notification</code>
      * @throws NotificationClientException see https://docs.notifications.service.gov.uk/java.html#get-the-status-of-one-message-error-codes
      */
-    Notification getNotificationById(String notificationId) throws NotificationClientException;
+    Notification getNotificationById(UUID notificationId) throws NotificationClientException;
 
     /**
      * The getPdfForLetter method will return a <code>byte[]</code> containing the PDF contents of a given letter notification.
@@ -187,7 +188,7 @@ public interface NotificationClientApi {
      * @return <code>byte[]</code> The raw pdf data.
      * @throws NotificationClientException see https://docs.notifications.service.gov.uk/java.html#get-a-pdf-for-a-letter-notification-error-codes
      */
-    byte[] getPdfForLetter(String notificationId) throws NotificationClientException;
+    byte[] getPdfForLetter(UUID notificationId) throws NotificationClientException;
 
     /**
      * The getNotifications method will create a GET HTTPS request to retrieve all the notifications.
@@ -197,11 +198,11 @@ public interface NotificationClientApi {
      * @param notification_type If notification_type is not empty or null only notifications of the given status will be returned.
      *                          Possible notificationTypes are sms|email
      * @param reference If reference is not empty or null only the notifications with that reference are returned.
-     * @param olderThanId If olderThanId is not empty or null only the notifications older than that notification id are returned.
+     * @param olderThanId If olderThanId is not null only the notifications older than that notification id are returned.
      * @return <code>NotificationList</code>
      * @throws NotificationClientException see https://docs.notifications.service.gov.uk/java.html#get-the-status-of-multiple-messages-error-codes
      */
-    NotificationList getNotifications(String status, String notification_type, String reference, String olderThanId) throws NotificationClientException;
+    NotificationList getNotifications(String status, String notification_type, String reference, UUID olderThanId) throws NotificationClientException;
 
     /**
      * The getTemplateById returns a <code>Template</code> given the template id.
@@ -210,7 +211,7 @@ public interface NotificationClientApi {
      * @return <code>Template</code>
      * @throws NotificationClientException see https://docs.notifications.service.gov.uk/java.html#get-a-template-by-id-error-codes
      */
-    Template getTemplateById(String templateId) throws NotificationClientException;
+    Template getTemplateById(UUID templateId) throws NotificationClientException;
 
     /**
      * The getTemplateVersion returns a <code>Template</code> given the template id and version.
@@ -220,7 +221,7 @@ public interface NotificationClientApi {
      * @return <code>Template</code>
      * @throws NotificationClientException see https://docs.notifications.service.gov.uk/java.html#get-a-template-by-id-and-version-error-codes
      */
-    Template getTemplateVersion(String templateId, int version) throws NotificationClientException;
+    Template getTemplateVersion(UUID templateId, int version) throws NotificationClientException;
 
     /**
      * Returns all the templates for your service. Filtered by template type if not null.
@@ -241,7 +242,7 @@ public interface NotificationClientApi {
      * @return <code>Template</code>
      * @throws NotificationClientException see https://docs.notifications.service.gov.uk/java.html#generate-a-preview-template-error-codes
      */
-    TemplatePreview generateTemplatePreview(String templateId, Map<String, Object> personalisation) throws NotificationClientException;
+    TemplatePreview generateTemplatePreview(UUID templateId, Map<String, Object> personalisation) throws NotificationClientException;
 
     /**
      * The getReceivedTextMessages returns a list of <code>ReceivedTextMessage</code>, the list is sorted by createdAt descending.
@@ -249,5 +250,5 @@ public interface NotificationClientApi {
      * @return <code>ReceivedTextMessageList</code>
      * @throws NotificationClientException
      */
-    ReceivedTextMessageList getReceivedTextMessages(String olderThanId) throws NotificationClientException;
+    ReceivedTextMessageList getReceivedTextMessages(UUID olderThanId) throws NotificationClientException;
 }

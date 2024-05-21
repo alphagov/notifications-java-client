@@ -296,9 +296,10 @@ public class NotificationClientTest {
         wireMockRule.stubFor(post("/v2/notifications/sms")
                 .willReturn(notFound()));
         NotificationClient client = new NotificationClient(COMBINED_API_KEY, BASE_URL);
+        UUID templateId = UUID.randomUUID();
 
         NotificationClientException e = assertThrows(NotificationClientException.class,
-                () -> client.sendSms("aTemplateId", "aPhoneNumber", emptyMap(), "aReference"));
+                () -> client.sendSms(templateId, "aPhoneNumber", emptyMap(), "aReference"));
 
         assertEquals(404, e.getHttpResult());
         assertEquals("Status code: 404 ", e.getMessage());
@@ -311,9 +312,11 @@ public class NotificationClientTest {
         wireMockRule.stubFor(post("/v2/notifications/email")
                 .willReturn(serverError()));
         NotificationClient client = new NotificationClient(COMBINED_API_KEY, BASE_URL);
+        UUID templateId = UUID.randomUUID();
+        UUID emailReplyToId = UUID.randomUUID();
 
         NotificationClientException e = assertThrows(NotificationClientException.class,
-                () -> client.sendEmail("aTemplateId", "anEmailAddress", emptyMap(), "aReference", "an emailReplyToId"));
+                () -> client.sendEmail(templateId, "anEmailAddress", emptyMap(), "aReference", emailReplyToId));
 
         assertEquals(500, e.getHttpResult());
         assertEquals("Status code: 500 ", e.getMessage());
@@ -331,8 +334,10 @@ public class NotificationClientTest {
         // setting up this map can be replaced with Map.of() in later Java versions
         Map<String, Object> personalisation = new HashMap<>();
         personalisation.put("application_date", "2018-01-01");
+        UUID templateId = UUID.randomUUID();
+        UUID emailReplyToId = UUID.randomUUID();
 
-        SendEmailResponse actual = client.sendEmail("aTemplateId", "anEmailAddress", personalisation, "aReference", "an emailReplyToId");
+        SendEmailResponse actual = client.sendEmail(templateId, "anEmailAddress", personalisation, "aReference", emailReplyToId);
 
         assertEquals(expected.getNotificationId(), actual.getNotificationId());
         assertEquals(expected.getReference(), actual.getReference().get());
@@ -349,10 +354,10 @@ public class NotificationClientTest {
         LoggedRequest request = validateRequest();
         NotifyEmailRequest requestReceivedByNotifyApi = objectMapper.readValue(request.getBodyAsString(), NotifyEmailRequest.class);
         assertEquals("anEmailAddress", requestReceivedByNotifyApi.getEmailAddress());
-        assertEquals("aTemplateId", requestReceivedByNotifyApi.getTemplateId());
+        assertEquals(templateId, requestReceivedByNotifyApi.getTemplateId());
         assertEquals(personalisation, requestReceivedByNotifyApi.getPersonalisation());
         assertEquals("aReference", requestReceivedByNotifyApi.getReference());
-        assertEquals("an emailReplyToId", requestReceivedByNotifyApi.getEmailReplyToId());
+        assertEquals(emailReplyToId, requestReceivedByNotifyApi.getEmailReplyToId());
         assertNull(requestReceivedByNotifyApi.getOneClickUnsubscribeURL());
     }
 
@@ -367,8 +372,10 @@ public class NotificationClientTest {
         Map<String, Object> personalisation = new HashMap<>();
         personalisation.put("application_date", "2018-01-01");
         URI oneClickUnsubscribeURL = URI.create("http://localhost/unsubscribe");
+        UUID templateId = UUID.randomUUID();
+        UUID emailReplyToId = UUID.randomUUID();
 
-        SendEmailResponse actual = client.sendEmail("aTemplateId", "anEmailAddress", personalisation, "aReference", "an emailReplyToId", oneClickUnsubscribeURL);
+        SendEmailResponse actual = client.sendEmail(templateId, "anEmailAddress", personalisation, "aReference", emailReplyToId, oneClickUnsubscribeURL);
 
         assertEquals(expected.getNotificationId(), actual.getNotificationId());
         assertEquals(expected.getReference(), actual.getReference().get());
@@ -385,10 +392,10 @@ public class NotificationClientTest {
         LoggedRequest request = validateRequest();
         NotifyEmailRequest requestReceivedByNotifyApi = objectMapper.readValue(request.getBodyAsString(), NotifyEmailRequest.class);
         assertEquals("anEmailAddress", requestReceivedByNotifyApi.getEmailAddress());
-        assertEquals("aTemplateId", requestReceivedByNotifyApi.getTemplateId());
+        assertEquals(templateId, requestReceivedByNotifyApi.getTemplateId());
         assertEquals(personalisation, requestReceivedByNotifyApi.getPersonalisation());
         assertEquals("aReference", requestReceivedByNotifyApi.getReference());
-        assertEquals("an emailReplyToId", requestReceivedByNotifyApi.getEmailReplyToId());
+        assertEquals(emailReplyToId, requestReceivedByNotifyApi.getEmailReplyToId());
         assertEquals(oneClickUnsubscribeURL, requestReceivedByNotifyApi.getOneClickUnsubscribeURL());
     }
 
@@ -397,9 +404,11 @@ public class NotificationClientTest {
         wireMockRule.stubFor(post("/v2/notifications/sms")
                 .willReturn(serverError()));
         NotificationClient client = new NotificationClient(COMBINED_API_KEY, BASE_URL);
+        UUID templateId = UUID.randomUUID();
+        UUID smsSenderId = UUID.randomUUID();
 
         NotificationClientException e = assertThrows(NotificationClientException.class,
-                () -> client.sendSms("aTemplateId", "a phone number", emptyMap(), "aReference", "an smsSenderId"));
+                () -> client.sendSms(templateId, "a phone number", emptyMap(), "aReference", smsSenderId));
 
         assertEquals(500, e.getHttpResult());
         assertEquals("Status code: 500 ", e.getMessage());
@@ -417,8 +426,10 @@ public class NotificationClientTest {
         // setting up this map can be replaced with Map.of() in later Java versions
         Map<String, Object> personalisation = new HashMap<>();
         personalisation.put("application_date", "2018-01-01");
+        UUID templateId = UUID.randomUUID();
+        UUID smsSenderId = UUID.randomUUID();
 
-        SendSmsResponse actual = client.sendSms("aTemplateId", "a phone number", personalisation, "aReference", "an smsSenderId");
+        SendSmsResponse actual = client.sendSms(templateId, "a phone number", personalisation, "aReference", smsSenderId);
 
         assertEquals(expected.getNotificationId(), actual.getNotificationId());
         assertEquals(expected.getReference(), actual.getReference().get());
@@ -433,10 +444,10 @@ public class NotificationClientTest {
         LoggedRequest request = validateRequest();
         NotifySmsRequest requestReceivedByNotifyApi = objectMapper.readValue(request.getBodyAsString(), NotifySmsRequest.class);
         assertEquals("a phone number", requestReceivedByNotifyApi.getPhoneNumber());
-        assertEquals("aTemplateId", requestReceivedByNotifyApi.getTemplateId());
+        assertEquals(templateId, requestReceivedByNotifyApi.getTemplateId());
         assertEquals(personalisation, requestReceivedByNotifyApi.getPersonalisation());
         assertEquals("aReference", requestReceivedByNotifyApi.getReference());
-        assertEquals("an smsSenderId", requestReceivedByNotifyApi.getSmsSenderId());
+        assertEquals(smsSenderId, requestReceivedByNotifyApi.getSmsSenderId());
     }
 
     @Test
@@ -449,9 +460,10 @@ public class NotificationClientTest {
         personalisation.put("address_line_1", "a1");
         personalisation.put("address_line_2", "a2");
         personalisation.put("address_line_3", "a3");
+        UUID templateId = UUID.randomUUID();
 
         NotificationClientException e = assertThrows(NotificationClientException.class,
-                () -> client.sendLetter("aTemplateId", personalisation, "aReference"));
+                () -> client.sendLetter(templateId, personalisation, "aReference"));
 
         assertEquals(500, e.getHttpResult());
         assertEquals("Status code: 500 ", e.getMessage());
@@ -471,8 +483,9 @@ public class NotificationClientTest {
         personalisation.put("address_line_1", "a1");
         personalisation.put("address_line_2", "a2");
         personalisation.put("address_line_3", "a3");
+        UUID templateId = UUID.randomUUID();
 
-        SendLetterResponse actual = client.sendLetter("aTemplateId", personalisation, "aReference");
+        SendLetterResponse actual = client.sendLetter(templateId, personalisation, "aReference");
 
         assertEquals(expected.getNotificationId(), actual.getNotificationId());
         assertEquals(expected.getReference(), actual.getReference().get());
@@ -488,7 +501,7 @@ public class NotificationClientTest {
 
         LoggedRequest request = validateRequest();
         NotifyLetterRequest requestReceivedByNotifyApi = objectMapper.readValue(request.getBodyAsString(), NotifyLetterRequest.class);
-        assertEquals("aTemplateId", requestReceivedByNotifyApi.getTemplateId());
+        assertEquals(templateId, requestReceivedByNotifyApi.getTemplateId());
         assertEquals(personalisation, requestReceivedByNotifyApi.getPersonalisation());
         assertEquals("aReference", requestReceivedByNotifyApi.getReference());
     }
@@ -502,7 +515,7 @@ public class NotificationClientTest {
                         .withResponseBody(new Body(objectMapper.writeValueAsString(expected)))));
         NotificationClient client = new NotificationClient(COMBINED_API_KEY, BASE_URL);
 
-        Notification actual = client.getNotificationById(notificationId.toString());
+        Notification actual = client.getNotificationById(notificationId);
 
         assertEquals(expected.getId(), actual.getId());
         assertEquals(expected.getReference(), actual.getReference().get());
@@ -539,8 +552,9 @@ public class NotificationClientTest {
                 .willReturn(ok()
                         .withResponseBody(new Body(objectMapper.writeValueAsString(expected)))));
         NotificationClient client = new NotificationClient(COMBINED_API_KEY, BASE_URL);
+        UUID olderThanId = UUID.randomUUID();
 
-        NotificationList actual = client.getNotifications("a stat", "a notification_type", "a ref", "an olderThanId");
+        NotificationList actual = client.getNotifications("a stat", "a notification_type", "a ref", olderThanId);
 
         assertEquals(expected.getNotifications().size(), actual.getNotifications().size());
         assertEquals(expected.getLinks().getCurrent().toString(), actual.getCurrentPageLink());
@@ -575,7 +589,7 @@ public class NotificationClientTest {
         assertEquals("a stat", request.queryParameter("status").firstValue());
         assertEquals("a notification_type", request.queryParameter("template_type").firstValue());
         assertEquals("a ref", request.queryParameter("reference").firstValue());
-        assertEquals("an olderThanId", request.queryParameter("older_than").firstValue());
+        assertEquals(olderThanId.toString(), request.queryParameter("older_than").firstValue());
     }
 
     @Test
@@ -587,7 +601,7 @@ public class NotificationClientTest {
                         .withResponseBody(new Body(pdfFile))));
         NotificationClient client = new NotificationClient(COMBINED_API_KEY, BASE_URL);
 
-        byte[] responsePdf = client.getPdfForLetter(notificationId.toString());
+        byte[] responsePdf = client.getPdfForLetter(notificationId);
 
         assertArrayEquals(pdfFile, responsePdf);
 
@@ -626,7 +640,7 @@ public class NotificationClientTest {
                         .withResponseBody(new Body(objectMapper.writeValueAsString(expected)))));
         NotificationClient client = new NotificationClient(COMBINED_API_KEY, BASE_URL);
 
-        Template actual = client.getTemplateById(templateId.toString());
+        Template actual = client.getTemplateById(templateId);
 
         assertEquals(expected.getId(), actual.getId());
         assertEquals(expected.getName(), actual.getName());
@@ -653,7 +667,7 @@ public class NotificationClientTest {
                         .withResponseBody(new Body(objectMapper.writeValueAsString(expected)))));
         NotificationClient client = new NotificationClient(COMBINED_API_KEY, BASE_URL);
 
-        Template actual = client.getTemplateVersion(templateId.toString(), 100);
+        Template actual = client.getTemplateVersion(templateId, 100);
 
         assertEquals(expected.getId(), actual.getId());
         assertEquals(expected.getName(), actual.getName());
@@ -711,7 +725,7 @@ public class NotificationClientTest {
                         .withResponseBody(new Body(objectMapper.writeValueAsString(expected)))));
         NotificationClient client = new NotificationClient(COMBINED_API_KEY, BASE_URL);
 
-        TemplatePreview actual = client.generateTemplatePreview(templateId.toString(), personalisation);
+        TemplatePreview actual = client.generateTemplatePreview(templateId, personalisation);
 
         assertEquals(expected.getId(), actual.getId());
         assertEquals(expected.getType(), actual.getTemplateType());
@@ -731,8 +745,9 @@ public class NotificationClientTest {
                 .willReturn(ok()
                         .withResponseBody(new Body(objectMapper.writeValueAsString(expected)))));
         NotificationClient client = new NotificationClient(COMBINED_API_KEY, BASE_URL);
+        UUID olderThanId = UUID.randomUUID();
 
-        ReceivedTextMessageList actual = client.getReceivedTextMessages("2024-05-13");
+        ReceivedTextMessageList actual = client.getReceivedTextMessages(olderThanId);
 
         assertEquals(expected.getReceivedTextMessages().size(), actual.getReceivedTextMessages().size());
         assertEquals(expected.getReceivedTextMessages().get(0).getId(), actual.getReceivedTextMessages().get(0).getId());
@@ -746,7 +761,7 @@ public class NotificationClientTest {
         assertEquals(expected.getLinks().getNext().toString(), actual.getNextPageLink().get());
 
         LoggedRequest request = validateRequest();
-        assertEquals("2024-05-13", request.queryParameter("older_than").firstValue());
+        assertEquals(olderThanId.toString(), request.queryParameter("older_than").firstValue());
     }
 
     @Test
@@ -766,9 +781,10 @@ public class NotificationClientTest {
                 .willReturn(unauthorized()));
         final UUID badApiKey = UUID.randomUUID();
         NotificationClient client = new NotificationClient("Api_key_name-" + SERVICE_ID + "-" + badApiKey, BASE_URL);
+        UUID templateId = UUID.randomUUID();
 
         NotificationClientException e = assertThrows(NotificationClientException.class,
-                () -> client.sendSms("aTemplateId", "aPhoneNumber", emptyMap(), "aReference"));
+                () -> client.sendSms(templateId, "aPhoneNumber", emptyMap(), "aReference"));
 
         assertEquals(401, e.getHttpResult());
         assertEquals("Status code: 401 ", e.getMessage());

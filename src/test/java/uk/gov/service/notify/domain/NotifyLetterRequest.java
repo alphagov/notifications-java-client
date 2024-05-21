@@ -7,14 +7,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
 
 public class NotifyLetterRequest {
 
-    private final String templateId;
+    private final UUID templateId;
     private final Map<String, ?> personalisation;
     private final String reference;
 
-    public NotifyLetterRequest(@JsonProperty("template_id") String templateId,
+    public NotifyLetterRequest(@JsonProperty("template_id") UUID templateId,
                                @JsonProperty("personalisation") Map<String, ?> personalisation,
                                @JsonProperty("reference") String reference) throws NotificationClientException {
         this.templateId = templateId;
@@ -32,7 +33,7 @@ public class NotifyLetterRequest {
     }
 
     @JsonProperty("template_id")
-    public String getTemplateId() {
+    public UUID getTemplateId() {
         return templateId;
     }
 
