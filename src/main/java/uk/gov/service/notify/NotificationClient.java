@@ -325,19 +325,32 @@ public class NotificationClient implements NotificationClientApi {
      * @return <code>JSONObject</code> a json object to be added to the
      *         personalisation is returned
      */
-    public static JSONObject prepareUpload(final byte[] documentContents, String filename,
-            boolean confirmEmailBeforeDownload, String retentionPeriod) throws NotificationClientException {
+    public static JSONObject prepareUpload(final byte[] documentContents,
+                                           String filename,
+                                           boolean confirmEmailBeforeDownload,
+                                           String retentionPeriod) throws NotificationClientException {
+        return internalPrepareUpload(documentContents, filename, confirmEmailBeforeDownload, retentionPeriod);
+    }
+
+    private static JSONObject internalPrepareUpload(final byte[] documentContents,
+                                                    String filename,
+                                                    Boolean confirmEmailBeforeDownload,
+                                                    String retentionPeriod) throws NotificationClientException {
         if (documentContents.length > 2 * 1024 * 1024) {
             throw new NotificationClientException(413, "File is larger than 2MB");
         }
         byte[] fileContentAsByte = Base64.encodeBase64(documentContents);
         String fileContent = new String(fileContentAsByte, ISO_8859_1);
 
+        Object filenameValue = Objects.nonNull(filename) ? filename : JSONObject.NULL;
+        Object confirmEmailBeforeDownloadValue = Objects.nonNull(confirmEmailBeforeDownload) ? confirmEmailBeforeDownload : JSONObject.NULL;
+        Object retentionPeriodValue = Objects.nonNull(retentionPeriod) ? retentionPeriod : JSONObject.NULL;
+
         JSONObject jsonFileObject = new JSONObject();
         jsonFileObject.put("file", fileContent);
-        jsonFileObject.put("filename", filename);
-        jsonFileObject.put("confirm_email_before_download", confirmEmailBeforeDownload);
-        jsonFileObject.put("retention_period", retentionPeriod);
+        jsonFileObject.put("filename", filenameValue);
+        jsonFileObject.put("confirm_email_before_download", confirmEmailBeforeDownloadValue);
+        jsonFileObject.put("retention_period", retentionPeriodValue);
         return jsonFileObject;
     }
 
@@ -357,20 +370,9 @@ public class NotificationClient implements NotificationClientApi {
      *         personalisation is returned
      */
     public static JSONObject prepareUpload(final byte[] documentContents,
-            boolean confirmEmailBeforeDownload, RetentionPeriodDuration retentionPeriod)
-            throws NotificationClientException {
-        if (documentContents.length > 2 * 1024 * 1024) {
-            throw new NotificationClientException(413, "File is larger than 2MB");
-        }
-        byte[] fileContentAsByte = Base64.encodeBase64(documentContents);
-        String fileContent = new String(fileContentAsByte, ISO_8859_1);
-
-        JSONObject jsonFileObject = new JSONObject();
-        jsonFileObject.put("file", fileContent);
-        jsonFileObject.put("filename", JSONObject.NULL);
-        jsonFileObject.put("confirm_email_before_download", confirmEmailBeforeDownload);
-        jsonFileObject.put("retention_period", retentionPeriod.toString());
-        return jsonFileObject;
+                                           boolean confirmEmailBeforeDownload,
+                                           RetentionPeriodDuration retentionPeriod) throws NotificationClientException {
+        return internalPrepareUpload(documentContents, null, confirmEmailBeforeDownload, retentionPeriod.toString());
     }
 
     /**
@@ -384,20 +386,9 @@ public class NotificationClient implements NotificationClientApi {
      * @return <code>JSONObject</code> a json object to be added to the
      *         personalisation is returned
      */
-    public static JSONObject prepareUpload(final byte[] documentContents, String filename)
-            throws NotificationClientException {
-        if (documentContents.length > 2 * 1024 * 1024) {
-            throw new NotificationClientException(413, "File is larger than 2MB");
-        }
-        byte[] fileContentAsByte = Base64.encodeBase64(documentContents);
-        String fileContent = new String(fileContentAsByte, ISO_8859_1);
-
-        JSONObject jsonFileObject = new JSONObject();
-        jsonFileObject.put("file", fileContent);
-        jsonFileObject.put("filename", filename);
-        jsonFileObject.put("confirm_email_before_download", JSONObject.NULL);
-        jsonFileObject.put("retention_period", JSONObject.NULL);
-        return jsonFileObject;
+    public static JSONObject prepareUpload(final byte[] documentContents,
+                                           String filename) throws NotificationClientException {
+        return internalPrepareUpload(documentContents, filename, null, null);
     }
 
     /**
@@ -409,17 +400,7 @@ public class NotificationClient implements NotificationClientApi {
      * @return <code>JSONObject</code> a json object to be added to the personalisation is returned
      */
     public static JSONObject prepareUpload(final byte[] documentContents) throws NotificationClientException {
-        if (documentContents.length > 2 * 1024 * 1024) {
-            throw new NotificationClientException(413, "File is larger than 2MB");
-        }
-        byte[] fileContentAsByte = Base64.encodeBase64(documentContents);
-        String fileContent = new String(fileContentAsByte, ISO_8859_1);
-        JSONObject jsonFileObject = new JSONObject();
-        jsonFileObject.put("file", fileContent);
-        jsonFileObject.put("filename", JSONObject.NULL);
-        jsonFileObject.put("confirm_email_before_download", JSONObject.NULL);
-        jsonFileObject.put("retention_period", JSONObject.NULL);
-        return jsonFileObject;
+        return internalPrepareUpload(documentContents, null, null, null);
     }
 
     /**
@@ -445,10 +426,10 @@ public class NotificationClient implements NotificationClientApi {
      *         personalisation is returned
      */
     public static JSONObject prepareUpload(final byte[] documentContents,
-            String filename,
-            boolean confirmEmailBeforeDownload,
-            RetentionPeriodDuration retentionPeriod) throws NotificationClientException {
-        return prepareUpload(documentContents, filename, confirmEmailBeforeDownload, retentionPeriod.toString());
+                                           String filename,
+                                           boolean confirmEmailBeforeDownload,
+                                           RetentionPeriodDuration retentionPeriod) throws NotificationClientException {
+        return internalPrepareUpload(documentContents, filename, confirmEmailBeforeDownload, retentionPeriod.toString());
     }
 
     private String performPostRequest(HttpURLConnection conn, JSONObject body, int expectedStatusCode) throws NotificationClientException {
@@ -477,7 +458,6 @@ public class NotificationClient implements NotificationClientApi {
     private String performGetRequest(HttpURLConnection conn) throws NotificationClientException {
         try{
             int httpResult = conn.getResponseCode();
-            StringBuilder stringBuilder;
             if (httpResult == 200) {
                 return readStream(conn.getInputStream());
             } else {
