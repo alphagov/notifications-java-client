@@ -5,21 +5,22 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.net.URI;
 import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
 
 public class NotifyEmailRequest {
 
     private final String emailAddress;
-    private final String templateId;
+    private final UUID templateId;
     private final Map<String, ?> personalisation;
     private final String reference;
-    private final String emailReplyToId;
+    private final UUID emailReplyToId;
     private final URI oneClickUnsubscribeURL;
 
     public NotifyEmailRequest(@JsonProperty("email_address") String emailAddress,
-                              @JsonProperty("template_id") String templateId,
+                              @JsonProperty("template_id") UUID templateId,
                               @JsonProperty("personalisation") Map<String, ?> personalisation,
                               @JsonProperty("reference") String reference,
-                              @JsonProperty("email_reply_to_id") String emailReplyToId,
+                              @JsonProperty("email_reply_to_id") UUID emailReplyToId,
                               @JsonProperty("one_click_unsubscribe_url") URI oneClickUnsubscribeURL) {
         this.emailAddress = emailAddress;
         this.templateId = templateId;
@@ -35,7 +36,7 @@ public class NotifyEmailRequest {
     }
 
     @JsonProperty("template_id")
-    public String getTemplateId() {
+    public UUID getTemplateId() {
         return templateId;
     }
 
@@ -50,7 +51,7 @@ public class NotifyEmailRequest {
     }
 
     @JsonProperty("email_reply_to_id")
-    public String getEmailReplyToId() {
+    public UUID getEmailReplyToId() {
         return emailReplyToId;
     }
 

@@ -1,3 +1,6 @@
+## Next release
+* Where UUIDs are expected the types in the API have changed from String to UUID.  You can wrap strings in UUID.fromString() if necessary.
+
 ## 5.1.0-RELEASE
 * Add a `oneClickUnsubscribeURL` parameter to `sendEmail`. The unsubscribe URL will be added to the headers of your email. Email clients will use it to add an unsubscribe button.  See https://www.notifications.service.gov.uk/using-notify/unsubscribe-links
 
