@@ -1,3 +1,6 @@
+## 5.2.1-RELEASE
+* Bump commons-io from 2.8.0 to 2.17.0
+
 ## 5.2.0-RELEASE
 * Added fields related to cost data in response:
   * `is_cost_data_ready`: This field is true if cost data is ready, and false if it isn't (Boolean).
