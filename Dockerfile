@@ -1,4 +1,5 @@
 FROM maven:3-jdk-8
+COPY ./ /notifications-java-client
 
 RUN \
     echo "Install Debian packages" \
