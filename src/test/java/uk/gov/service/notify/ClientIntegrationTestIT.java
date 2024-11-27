@@ -58,7 +58,7 @@ public class ClientIntegrationTestIT {
         assertFalse(notificationList.getNotifications().isEmpty());
         // Just check the first notification in the list.
         assertNotification(notificationList.getNotifications().get(0));
-        String baseUrl = System.getenv("NOTIFY_API_URL");
+        String baseUrl = System.getenv("FUNCTIONAL_TESTS_API_HOST");
         assertEquals(baseUrl + "/v2/notifications", notificationList.getCurrentPageLink());
         if (notificationList.getNextPageLink().isPresent()){
             String nextUri = notificationList.getNextPageLink().get();
@@ -74,7 +74,7 @@ public class ClientIntegrationTestIT {
     public void testEmailNotificationWithoutPersonalisationReturnsErrorMessageIT() {
         NotificationClient client = getClient();
         try {
-            client.sendEmail(System.getenv("EMAIL_TEMPLATE_ID"), System.getenv("FUNCTIONAL_TEST_EMAIL"), null, null);
+            client.sendEmail(System.getenv("FUNCTIONAL_TEST_EMAIL_TEMPLATE_ID"), System.getenv("FUNCTIONAL_TEST_EMAIL"), null, null);
             fail("Expected NotificationClientException: Template missing personalisation: name");
         } catch (NotificationClientException e) {
             assert(e.getMessage().contains("Missing personalisation: name"));
@@ -93,11 +93,11 @@ public class ClientIntegrationTestIT {
         personalisation.put("name", uniqueName);
 
         SendEmailResponse response = client.sendEmail(
-                System.getenv("EMAIL_TEMPLATE_ID"),
+                System.getenv("FUNCTIONAL_TEST_EMAIL_TEMPLATE_ID"),
                 System.getenv("FUNCTIONAL_TEST_EMAIL"),
                 personalisation,
                 uniqueName,
-                System.getenv("EMAIL_REPLY_TO_ID"));
+                System.getenv("FUNCTIONAL_TESTS_SERVICE_EMAIL_REPLY_TO_ID"));
 
         assertNotificationEmailResponse(response, uniqueName);
 
@@ -120,7 +120,7 @@ public class ClientIntegrationTestIT {
 
         try {
             client.sendEmail(
-                    System.getenv("EMAIL_TEMPLATE_ID"),
+                    System.getenv("FUNCTIONAL_TEST_EMAIL_TEMPLATE_ID"),
                     System.getenv("FUNCTIONAL_TEST_EMAIL"),
                     personalisation,
                     uniqueName,
@@ -147,7 +147,7 @@ public class ClientIntegrationTestIT {
         personalisation.put("name", documentFileObject);
 
         String reference = UUID.randomUUID().toString();
-        SendEmailResponse emailResponse = client.sendEmail(System.getenv("EMAIL_TEMPLATE_ID"),
+        SendEmailResponse emailResponse = client.sendEmail(System.getenv("FUNCTIONAL_TEST_EMAIL_TEMPLATE_ID"),
                 System.getenv("FUNCTIONAL_TEST_EMAIL"),
                 personalisation,
                 reference
@@ -161,7 +161,7 @@ public class ClientIntegrationTestIT {
     public void testSmsNotificationWithoutPersonalisationReturnsErrorMessageIT() {
         NotificationClient client = getClient();
         try {
-            client.sendSms(System.getenv("SMS_TEMPLATE_ID"), System.getenv("FUNCTIONAL_TEST_NUMBER"), null, null);
+            client.sendSms(System.getenv("FUNCTIONAL_TEST_SMS_TEMPLATE_ID"), System.getenv("TEST_NUMBER"), null, null);
             fail("Expected NotificationClientException: Template missing personalisation: name");
         } catch (NotificationClientException e) {
             assert(e.getMessage().contains("Missing personalisation: name"));
@@ -171,18 +171,18 @@ public class ClientIntegrationTestIT {
 
     @Test
     public void testSmsNotificationWithValidSmsSenderIdIT() throws NotificationClientException {
-        NotificationClient client = getClient("API_SENDING_KEY");
+        NotificationClient client = getClient("FUNCTIONAL_TESTS_SERVICE_API_KEY");
 
         HashMap<String, String> personalisation = new HashMap<>();
         String uniqueName = UUID.randomUUID().toString();
         personalisation.put("name", uniqueName);
 
         SendSmsResponse response = client.sendSms(
-                System.getenv("SMS_TEMPLATE_ID"),
-                System.getenv("FUNCTIONAL_TEST_NUMBER"),
+                System.getenv("FUNCTIONAL_TEST_SMS_TEMPLATE_ID"),
+                System.getenv("TEST_NUMBER"),
                 personalisation,
                 uniqueName,
-                System.getenv("SMS_SENDER_ID"));
+                System.getenv("FUNCTIONAL_TESTS_SERVICE_SMS_SENDER_ID"));
 
         assertNotificationSmsResponse(response, uniqueName);
 
@@ -204,8 +204,8 @@ public class ClientIntegrationTestIT {
 
         try {
             client.sendSms(
-                    System.getenv("SMS_TEMPLATE_ID"),
-                    System.getenv("FUNCTIONAL_TEST_NUMBER"),
+                    System.getenv("FUNCTIONAL_TEST_SMS_TEMPLATE_ID"),
+                    System.getenv("TEST_NUMBER"),
                     personalisation,
                     uniqueName,
                     fake_uuid.toString());
@@ -224,7 +224,7 @@ public class ClientIntegrationTestIT {
         HashMap<String, String> personalisation = new HashMap<>();
         String uniqueString = UUID.randomUUID().toString();
         personalisation.put("name", uniqueString);
-        SendEmailResponse response = client.sendEmail(System.getenv("EMAIL_TEMPLATE_ID"), System.getenv("FUNCTIONAL_TEST_EMAIL"), personalisation, uniqueString);
+        SendEmailResponse response = client.sendEmail(System.getenv("FUNCTIONAL_TEST_EMAIL_TEMPLATE_ID"), System.getenv("FUNCTIONAL_TEST_EMAIL"), personalisation, uniqueString);
         assertNotificationEmailResponse(response, uniqueString);
         NotificationList notifications = client.getNotifications(null, null, uniqueString, null);
         assertEquals(1, notifications.getNotifications().size());
@@ -234,8 +234,8 @@ public class ClientIntegrationTestIT {
     @Test
     public void testGetTemplateById() throws NotificationClientException {
         NotificationClient client = getClient();
-        Template template = client.getTemplateById(System.getenv("LETTER_TEMPLATE_ID"));
-        assertEquals(System.getenv("LETTER_TEMPLATE_ID"), template.getId().toString());
+        Template template = client.getTemplateById(System.getenv("FUNCTIONAL_TEST_LETTER_TEMPLATE_ID"));
+        assertEquals(System.getenv("FUNCTIONAL_TEST_LETTER_TEMPLATE_ID"), template.getId().toString());
         assertNotNull(template.getCreatedAt());
         assertNotNull(template.getTemplateType());
         assertNotNull(template.getBody());
@@ -248,8 +248,8 @@ public class ClientIntegrationTestIT {
     @Test
     public void testGetTemplateVersion() throws NotificationClientException {
         NotificationClient client = getClient();
-        Template template = client.getTemplateVersion(System.getenv("SMS_TEMPLATE_ID"), 1);
-        assertEquals(System.getenv("SMS_TEMPLATE_ID"), template.getId().toString());
+        Template template = client.getTemplateVersion(System.getenv("FUNCTIONAL_TEST_SMS_TEMPLATE_ID"), 1);
+        assertEquals(System.getenv("FUNCTIONAL_TEST_SMS_TEMPLATE_ID"), template.getId().toString());
         assertNotNull(template.getCreatedAt());
         assertNotNull(template.getTemplateType());
         assertNotNull(template.getBody());
@@ -270,8 +270,8 @@ public class ClientIntegrationTestIT {
         HashMap<String, Object> personalisation = new HashMap<>();
         String uniqueName = UUID.randomUUID().toString();
         personalisation.put("name", uniqueName);
-        TemplatePreview template = client.generateTemplatePreview(System.getenv("EMAIL_TEMPLATE_ID"), personalisation);
-        assertEquals(System.getenv("EMAIL_TEMPLATE_ID"), template.getId().toString());
+        TemplatePreview template = client.generateTemplatePreview(System.getenv("FUNCTIONAL_TEST_EMAIL_TEMPLATE_ID"), personalisation);
+        assertEquals(System.getenv("FUNCTIONAL_TEST_EMAIL_TEMPLATE_ID"), template.getId().toString());
         assertNotNull(template.getTemplateType());
         assertNotNull(template.getBody());
         assertNotNull(template.getSubject());
@@ -280,7 +280,7 @@ public class ClientIntegrationTestIT {
 
     @Test
     public void testGetReceivedTextMessages() throws NotificationClientException {
-        NotificationClient client = getClient("INBOUND_SMS_QUERY_KEY");
+        NotificationClient client = getClient("FUNCTIONAL_TESTS_SERVICE_API_TEST_KEY");
 
         ReceivedTextMessageList response = client.getReceivedTextMessages(null);
         ReceivedTextMessage receivedTextMessage = assertReceivedTextMessageList(response);
@@ -361,14 +361,14 @@ public class ClientIntegrationTestIT {
     }
 
     private NotificationClient getClient(){
-        String apiKey = System.getenv("API_KEY");
-        String baseUrl = System.getenv("NOTIFY_API_URL");
+        String apiKey = System.getenv("FUNCTIONAL_TESTS_SERVICE_API_TEST_KEY");
+        String baseUrl = System.getenv("FUNCTIONAL_TESTS_API_HOST");
         return new NotificationClient(apiKey, baseUrl);
     }
 
     private NotificationClient getClient(String api_key){
         String apiKey = System.getenv(api_key);
-        String baseUrl = System.getenv("NOTIFY_API_URL");
+        String baseUrl = System.getenv("FUNCTIONAL_TESTS_API_HOST");
         return new NotificationClient(apiKey, baseUrl);
     }
 
@@ -376,7 +376,7 @@ public class ClientIntegrationTestIT {
         HashMap<String, String> personalisation = new HashMap<>();
         String uniqueName = UUID.randomUUID().toString();
         personalisation.put("name", uniqueName);
-        SendEmailResponse response = client.sendEmail(System.getenv("EMAIL_TEMPLATE_ID"),
+        SendEmailResponse response = client.sendEmail(System.getenv("FUNCTIONAL_TEST_EMAIL_TEMPLATE_ID"),
                 System.getenv("FUNCTIONAL_TEST_EMAIL"), personalisation, uniqueName);
         assertNotificationEmailResponse(response, uniqueName);
         return response;
@@ -386,7 +386,7 @@ public class ClientIntegrationTestIT {
         HashMap<String, Object> personalisation = new HashMap<>();
         String uniqueName = UUID.randomUUID().toString();
         personalisation.put("name", uniqueName);
-        SendSmsResponse response = client.sendSms(System.getenv("SMS_TEMPLATE_ID"), System.getenv("FUNCTIONAL_TEST_NUMBER"), personalisation, uniqueName);
+        SendSmsResponse response = client.sendSms(System.getenv("FUNCTIONAL_TEST_SMS_TEMPLATE_ID"), System.getenv("TEST_NUMBER"), personalisation, uniqueName);
         assertNotificationSmsResponse(response, uniqueName);
         return response;
     }
@@ -399,7 +399,7 @@ public class ClientIntegrationTestIT {
         personalisation.put("address_line_1", addressLine1);
         personalisation.put("address_line_2", addressLine2);
         personalisation.put("postcode", postcode);
-        SendLetterResponse response = client.sendLetter(System.getenv("LETTER_TEMPLATE_ID"), personalisation, addressLine1);
+        SendLetterResponse response = client.sendLetter(System.getenv("FUNCTIONAL_TEST_LETTER_TEMPLATE_ID"), personalisation, addressLine1);
         assertNotificationLetterResponse(response, addressLine1);
         return response;
     }
