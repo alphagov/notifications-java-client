@@ -527,11 +527,11 @@ public class ClientIntegrationTestIT {
                 }
 
                 count += 1;
-                if (count > 10) { // total time slept at this point is 55 seconds
+                if (count > 24) { // total time slept at this point is 120 seconds
                     throw e;
                 } else {
                     try {
-                        Thread.sleep(count * 1000);
+                        Thread.sleep(5000);
                     } catch (InterruptedException e1) {
                         Thread.currentThread().interrupt();
                     }
