@@ -18,7 +18,7 @@ test: ## Run tests
 
 .PHONY: integration-test
 integration-test: ## Run integration tests
-	mvn --batch-mode clean integration-test
+	mvn --batch-mode clean verify -Dgpg.skip
 
 .PHONY: bootstrap-with-docker
 bootstrap-with-docker: ## Prepare the Docker builder image
