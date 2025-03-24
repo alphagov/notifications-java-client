@@ -61,7 +61,6 @@ public class EmailRequestTest {
         assertEquals(templateId, request.getTemplateId());
         assertEquals(identifier, request.getRecipientIdentifier());
         assertNull(request.getBillingCode());
-        assertNull(request.getEmailReplyToId());
         assertNull(request.getReference());
         assertNull(request.getPersonalisation());
     }
@@ -70,7 +69,6 @@ public class EmailRequestTest {
     public void emailRequestCanBeConvertedToJson() {
         String templateId = UUID.randomUUID().toString();
         String emailAddress = "user@email.com";
-        String emailReplyToId = UUID.randomUUID().toString();
         String reference = "some-reference";
         String billingCode = "some-billing-code";
         Map<String, String> personalisation = new HashMap(){{
@@ -82,7 +80,6 @@ public class EmailRequestTest {
         EmailRequest request = new EmailRequest.Builder()
                 .withTemplateId(templateId)
                 .withEmailAddress(emailAddress)
-                .withEmailReplyToId(emailReplyToId)
                 .withReference(reference)
                 .withBillingCode(billingCode)
                 .withPersonalisation(personalisation)
@@ -92,7 +89,6 @@ public class EmailRequestTest {
         JsonObject actual = gsonInstance.toJsonTree(request).getAsJsonObject();
         assertEquals(templateId, actual.get("template_id").getAsString());
         assertEquals(emailAddress, actual.get("email_address").getAsString());
-        assertEquals(emailReplyToId, actual.get("email_reply_to_id").getAsString());
         assertEquals(reference, actual.get("reference").getAsString());
         assertEquals(billingCode, actual.get("billing_code").getAsString());
         assertEquals("bar", actual.getAsJsonObject("personalisation").get("foo").getAsString());

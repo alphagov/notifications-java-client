@@ -4,7 +4,7 @@
     
     <groupId>gov.va.vanotify</groupId>
     <artifactId>vanotify-java-client</artifactId>
-    <version>2.0.3</version>
+    <version>3.0.0</version>
     <packaging>jar</packaging>
     
     <name>VANotify Java client</name>
@@ -92,7 +92,7 @@
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
-            <version>2.8.0</version>
+            <version>2.18.0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>

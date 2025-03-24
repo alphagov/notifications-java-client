@@ -89,61 +89,6 @@ public class ClientIntegrationTestIT {
         }
     }
 
-    @Test
-    public void testEmailNotificationWithValidEmailReplyToIdIT() throws NotificationClientException {
-        NotificationClient client = getClient();
-        SendEmailResponse emailResponse = sendEmailAndAssertResponse(client);
-
-        HashMap<String, String> personalisation = new HashMap<>();
-        String uniqueName = UUID.randomUUID().toString();
-        personalisation.put("name", uniqueName);
-
-        SendEmailResponse response = client.sendEmail(new EmailRequest.Builder()
-                .withTemplateId(System.getenv("EMAIL_TEMPLATE_ID"))
-                .withEmailAddress(System.getenv("FUNCTIONAL_TEST_EMAIL"))
-                .withPersonalisation(personalisation)
-                .withReference(uniqueName)
-                .withEmailReplyToId(System.getenv("EMAIL_REPLY_TO_ID"))
-                .build()
-        );
-
-        assertNotificationEmailResponse(response, uniqueName, null);
-
-        Notification notification = client.getNotificationById(emailResponse.getNotificationId().toString());
-        assertNotification(notification);
-    }
-
-    @Test
-    public void testEmailNotificationWithInValidEmailReplyToIdIT() throws NotificationClientException {
-        NotificationClient client = getClient();
-        sendEmailAndAssertResponse(client);
-
-        HashMap<String, String> personalisation = new HashMap<>();
-        String uniqueName = UUID.randomUUID().toString();
-        personalisation.put("name", uniqueName);
-
-        UUID fake_uuid = UUID.randomUUID();
-
-        boolean exceptionThrown = false;
-
-        try {
-            client.sendEmail(new EmailRequest.Builder()
-                    .withTemplateId(System.getenv("EMAIL_TEMPLATE_ID"))
-                    .withEmailAddress(System.getenv("FUNCTIONAL_TEST_EMAIL"))
-                    .withPersonalisation(personalisation)
-                    .withReference(uniqueName)
-                    .withEmailReplyToId(fake_uuid.toString())
-                    .build()
-            );
-        } catch (final NotificationClientException ex){
-            exceptionThrown = true;
-            assertTrue(ex.getMessage().contains("does not exist in database for service id"));
-        }
-
-        assertTrue(exceptionThrown);
-
-    }
-
     @Disabled
     @Test
     public void testEmailNotificationWithUploadedDocumentInPersonalisation() throws NotificationClientException, IOException {
@@ -336,39 +281,6 @@ public class ClientIntegrationTestIT {
         assertNotNull(template.getLetterContactBlock());
     }
 
-    @Test
-    public void testGetTemplateVersion() throws NotificationClientException {
-        NotificationClient client = getClient();
-        Template template = client.getTemplateVersion(System.getenv("SMS_TEMPLATE_ID"), 1);
-        assertEquals(System.getenv("SMS_TEMPLATE_ID"), template.getId().toString());
-        assertNotNull(template.getCreatedAt());
-        assertNotNull(template.getTemplateType());
-        assertNotNull(template.getBody());
-        assertNotNull(template.getName());
-        assertNotNull(template.getVersion());
-    }
-
-    @Test
-    public void testGetAllTemplates() throws NotificationClientException {
-        NotificationClient client = getClient();
-        TemplateList templateList = client.getAllTemplates("");
-        assertTrue(2 <= templateList.getTemplates().size());
-    }
-
-    @Test
-    public void testGetTemplatePreview() throws NotificationClientException {
-        NotificationClient client = getClient();
-        HashMap<String, Object> personalisation = new HashMap<>();
-        String uniqueName = UUID.randomUUID().toString();
-        personalisation.put("name", uniqueName);
-        TemplatePreview template = client.generateTemplatePreview(System.getenv("EMAIL_TEMPLATE_ID"), personalisation);
-        assertEquals(System.getenv("EMAIL_TEMPLATE_ID"), template.getId().toString());
-        assertNotNull(template.getTemplateType());
-        assertNotNull(template.getBody());
-        assertNotNull(template.getSubject());
-        assertTrue(template.getBody().contains(uniqueName));
-    }
-
     @Disabled
     @Test
     public void testGetReceivedTextMessages() throws NotificationClientException {
@@ -527,7 +439,6 @@ public class ClientIntegrationTestIT {
 
     private void assertNotificationEmailResponse(final SendEmailResponse response, final String uniqueName, String billingCode){
         assertNotNull(response);
-        assertTrue(response.getBody().contains(uniqueName));
         assertEquals(Optional.of(uniqueName), response.getReference());
         assertEquals(Optional.ofNullable(billingCode), response.getBillingCode());
         assertNotNull(response.getNotificationId());
