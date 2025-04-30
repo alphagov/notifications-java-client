@@ -130,8 +130,9 @@ public interface NotificationClientApi {
      *                                  Cannot be an empty string or null for precompiled PDF files.
      * @param precompiledPDF            A file containing a PDF conforming to the Notify standards for printing.
      *                                  The file must be a PDF and cannot be null.
-     * @param postage                   You can choose first or second class postage for your precompiled letter.
-     *                                  Set the value to first for first class, or second for second class. If you do not pass in this argument, the postage will default to second class.
+     * @param postage                   You can choose first class, second class or economy postage for your precompiled letter.
+     *                                  Set the value to first for first class, second for second class, or economy for economy mail.
+     *                                  If you do not pass in this argument, the postage will default to second class.
      * @return <code>LetterResponse</code>
      *
      * @throws NotificationClientException see https://docs.notifications.service.gov.uk/java.html#send-a-precompiled-letter-error-codes
