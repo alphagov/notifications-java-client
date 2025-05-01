@@ -29,6 +29,16 @@ public interface NotificationClientApi {
      */
     SendSmsResponse sendSms(SmsRequest smsRequest) throws NotificationClientException;
 
+    /**
+     * The sendPush method will create an HTTPS POST request. A JWT token will be created and added as an Authorization header to the request.
+     *
+     * @param pushRequest  Push request built using fluent builder API.
+     * {@link PushRequest.Builder}
+     *
+     * @return <code>SendPushResponse</code>
+     * @throws NotificationClientException see https://docs.notifications.service.gov.uk/java.html#send-an-email-error-codes
+     */
+    SendPushResponse sendPush(PushRequest pushRequest) throws NotificationClientException;
 
     /**
      * The sendLetter method will create an HTTPS POST request. A JWT token will be created and added as an Authorization header to the request.
