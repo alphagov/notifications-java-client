@@ -3,7 +3,7 @@ package gov.va.vanotify;
 import java.util.Map;
 
 public abstract class NotificationPushRequest {
-    protected final String mobileApp;
+    protected final MobileAppType mobileApp;
     protected final String templateId;
     protected final Map<String, ?> personalisation;
 
@@ -12,10 +12,12 @@ public abstract class NotificationPushRequest {
         this.templateId = builder.templateId;
         this.personalisation = builder.personalisation;
 
-        if (this.templateId == null || this.templateId.isEmpty()) throw new IllegalStateException("Missing templateId");
+        if (this.templateId == null || this.templateId.isEmpty()) {
+            throw new IllegalStateException("Missing templateId");
+        }
     }
 
-    public String getMobileApp() {
+    public MobileAppType getMobileApp() {
         return mobileApp;
     }
 
@@ -28,7 +30,7 @@ public abstract class NotificationPushRequest {
     }
 
     public abstract static class Builder<T extends NotificationPushRequest, B extends Builder> {        
-        protected String mobileApp;
+        protected MobileAppType mobileApp = MobileAppType.VA_FLAGSHIP_APP;
         protected String templateId;
         protected Map<String, ?> personalisation;
 
@@ -36,10 +38,11 @@ public abstract class NotificationPushRequest {
 
         /**
          * Sets <b>optional</b> mobileApp.
+         * Default value is {@link MobileAppType.VA_FLAGSHIP_APP}
          * @param mobileApp
          * @return reference to itself (builder)
          */
-        public B withMobileApp(String mobileApp) {
+        public B withMobileApp(MobileAppType mobileApp) {
             this.mobileApp = mobileApp;
             return this.getInstance();
         }
@@ -68,7 +71,6 @@ public abstract class NotificationPushRequest {
          * Abstract method for building a NotificationPushRequest
          * Use one of concrete implementations:
          * {@link PushRequest.Builder}
-         * {@link PushBroadcastRequest.Builder}
          *
          * @throws IllegalStateException if any required fields are missing
          */

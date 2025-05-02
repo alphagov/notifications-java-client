@@ -27,6 +27,18 @@ public class PushRequestTest {
     }
 
     @Test
+    public void PushRequestRequiresICNRecipientId(){
+        Identifier identifier = new Identifier(IdentifierType.VAPROFILEID, "1234");
+
+        assertThrows(IllegalStateException.class, () -> {
+            new PushRequest.Builder()
+                    .withTemplateId("1234")
+                    .withRecipientIdentifier(identifier)
+                    .build();
+        });
+    }
+
+    @Test
     public void PushRequestRequiredArguments(){
         Identifier identifier = new Identifier(IdentifierType.ICN, "1234");
 

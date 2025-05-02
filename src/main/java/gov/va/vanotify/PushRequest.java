@@ -12,7 +12,10 @@ public class PushRequest extends NotificationPushRequest {
     private PushRequest(Builder builder) {
         super(builder);
         this.recipientIdentifier = builder.recipientIdentifier;
-        if (this.recipientIdentifier == null || !this.recipientIdentifier.getIdentifierType().equals(IdentifierType.ICN)) {
+        if (this.recipientIdentifier == null) {
+            throw new IllegalStateException("missing ICN recipientIdentifier");
+        }
+        if (!this.recipientIdentifier.getIdentifierType().equals(IdentifierType.ICN)) {
             throw new IllegalStateException("recipientIdentifier must be of type ICN");
         }
     }

@@ -148,6 +148,12 @@ public class NotificationClient implements NotificationClientApi {
         return gsonInstance.fromJson(response, SendPushResponse.class);
     }
 
+    public SendPushResponse sendPushBroadcast(PushBroadcastRequest pushBroadcastRequest) throws NotificationClientException {        
+        HttpURLConnection conn = createConnectionAndSetHeaders(baseUrl + "/v2/notifications/push/broadcast", "POST");
+        String response = performPostRequest(conn, gsonInstance.toJson(pushBroadcastRequest), HttpsURLConnection.HTTP_CREATED);
+        return gsonInstance.fromJson(response, SendPushResponse.class);
+    }
+
     public SendLetterResponse sendLetter(String templateId, Map<String, ?> personalisation, String reference) throws NotificationClientException {
         JsonObject body = createBodyForPostRequest(templateId, null, null, personalisation, reference, null, null, null);
         HttpURLConnection conn = createConnectionAndSetHeaders(baseUrl + "/v2/notifications/letter", "POST");

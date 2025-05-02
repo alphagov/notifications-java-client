@@ -48,6 +48,24 @@ public class ClientIntegrationTestIT {
         assertPdfResponse(client, notificationId);
     }
 
+    @Test
+    public void sendPushAndAssertResponse() throws NotificationClientException {
+        NotificationClient client = getClient();
+        HashMap<String, Object> personalisation = new HashMap<>();
+        String appointment_date = "12/02/2025";
+        String appointment_time = "10:00";
+        personalisation.put("appointment_date", appointment_date);
+        personalisation.put("appointment_time", appointment_time);
+        Identifier identifier = new Identifier(IdentifierType.ICN, "1012832025V743496");
+        SendPushResponse response = client.sendPush(new PushRequest.Builder()
+                .withTemplateId("1755CD4C33BB0851A416189616441067")
+                .withRecipientIdentifier(identifier)
+                .withPersonalisation(personalisation)
+                .build()
+        );
+        assertEquals("success", response.getResult());
+    }
+
 
     @Disabled("This test fails because the API Dev environment doesn't return any notifications.  This route is not exposed to users via Postman.")
     @Test
@@ -413,7 +431,7 @@ public class ClientIntegrationTestIT {
         assertNotificationSmsResponse(response, uniqueName, billingCode);
         return response;
     }
-
+    
     private SendLetterResponse sendLetterAndAssertResponse(final NotificationClient client) throws NotificationClientException {
         HashMap<String, String> personalisation = new HashMap<>();
         String addressLine1 = UUID.randomUUID().toString();

@@ -41,6 +41,17 @@ public interface NotificationClientApi {
     SendPushResponse sendPush(PushRequest pushRequest) throws NotificationClientException;
 
     /**
+     * The sendPushBroadcast method will create an HTTPS POST request. A JWT token will be created and added as an Authorization header to the request.
+     *
+     * @param pushBroadcastRequest  Push request built using fluent builder API.
+     * {@link PushBroadcastRequest.Builder}
+     *
+     * @return <code>SendPushResponse</code>
+     * @throws NotificationClientException see https://docs.notifications.service.gov.uk/java.html#send-an-email-error-codes
+     */
+    SendPushResponse sendPushBroadcast(PushBroadcastRequest pushBroadcastRequest) throws NotificationClientException;
+
+    /**
      * The sendLetter method will create an HTTPS POST request. A JWT token will be created and added as an Authorization header to the request.
      *
      * @param templateId      Find templateId by clicking API info for the template you want to send
