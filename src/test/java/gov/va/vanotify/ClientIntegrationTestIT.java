@@ -66,6 +66,21 @@ public class ClientIntegrationTestIT {
         assertEquals("success", response.getResult());
     }
 
+    @Test
+    public void sendPushBroadcastAndAssertResponse() throws NotificationClientException {
+        NotificationClient client = getClient();
+        HashMap<String, Object> personalisation = new HashMap<>();
+        String message = "foo";
+        personalisation.put("message", message);
+        SendPushResponse response = client.sendPushBroadcast(new PushBroadcastRequest.Builder()
+                .withMobileApp(MobileAppType.VA_FLAGSHIP_APP)
+                .withTemplateId("1755CD4C33BB0851A416189616441067")
+                .withTopicSID(UUID.randomUUID().toString())
+                .withPersonalisation(personalisation)
+                .build()
+        );
+        assertEquals("success", response.getResult());
+    }    
 
     @Disabled("This test fails because the API Dev environment doesn't return any notifications.  This route is not exposed to users via Postman.")
     @Test

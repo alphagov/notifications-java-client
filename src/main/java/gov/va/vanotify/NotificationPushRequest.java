@@ -38,7 +38,7 @@ public abstract class NotificationPushRequest {
 
         /**
          * Sets <b>optional</b> mobileApp.
-         * Default value is {@link MobileAppType.VA_FLAGSHIP_APP}
+         * Default value is {@link MobileAppType} VA_FLAGSHIP_APP
          * @param mobileApp
          * @return reference to itself (builder)
          */
