@@ -12,6 +12,7 @@ public class PushRequest extends NotificationPushRequest {
     private PushRequest(Builder builder) {
         super(builder);
         this.recipientIdentifier = builder.recipientIdentifier;
+        
         if (this.recipientIdentifier == null) {
             throw new IllegalStateException("missing ICN recipientIdentifier");
         }
@@ -38,7 +39,7 @@ public class PushRequest extends NotificationPushRequest {
 
         /**
          * Sets <b>required</b> recipientIdentifier.
-         * @param recipientIdentifier  The mobile phone number
+         * @param recipientIdentifier  The recipient identifier (must be of type ICN)
          * @return reference to itself (builder)
          */
         public Builder withRecipientIdentifier(Identifier recipientIdentifier) {

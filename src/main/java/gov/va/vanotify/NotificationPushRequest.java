@@ -38,8 +38,8 @@ public abstract class NotificationPushRequest {
 
         /**
          * Sets <b>optional</b> mobileApp.
-         * Default value is {@link MobileAppType} VA_FLAGSHIP_APP
-         * @param mobileApp
+         * Default value is {@link MobileAppType#VA_FLAGSHIP_APP}
+         * @param mobileApp name of the PUSH mobile app
          * @return reference to itself (builder)
          */
         public B withMobileApp(MobileAppType mobileApp) {
@@ -49,7 +49,7 @@ public abstract class NotificationPushRequest {
 
         /**
          * Sets <b>required</b> templateId.
-         * @param templateId    The template id is visible on the template page in the application.
+         * @param templateId    The VEText template id.
          * @return reference to itself (builder)
          */
         public B withTemplateId(String templateId) {
@@ -72,6 +72,7 @@ public abstract class NotificationPushRequest {
          * Use one of concrete implementations:
          * {@link PushRequest.Builder}
          *
+         * @return a fully constructed NotificationPushRequest
          * @throws IllegalStateException if any required fields are missing
          */
         public abstract T build();

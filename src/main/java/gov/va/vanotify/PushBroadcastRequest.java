@@ -12,8 +12,9 @@ public class PushBroadcastRequest extends NotificationPushRequest {
     private PushBroadcastRequest(Builder builder) {
         super(builder);
         this.topic_sid = builder.topic_sid;
+        
         if (this.topic_sid == null || this.topic_sid.isEmpty()) {
-            throw new IllegalStateException("missing ICN recipientIdentifier");
+            throw new IllegalStateException("missing broadcast topic_sid");
         }
     }
 
@@ -35,7 +36,7 @@ public class PushBroadcastRequest extends NotificationPushRequest {
 
         /**
          * Sets <b>required</b> topic_sid.
-         * @param topic_sid  The mobile phone number
+         * @param topic_sid  The broadcast topic SID
          * @return reference to itself (builder)
          */
         public Builder withTopicSID(String topic_sid) {
@@ -45,7 +46,7 @@ public class PushBroadcastRequest extends NotificationPushRequest {
 
         /**
          * Builds {@link PushBroadcastRequest}
-         * @return <code>SmsRequest</code>
+         * @return <code>PushBroadcastRequest</code>
          * @throws IllegalStateException if any required fields are missing
          */
         @Override

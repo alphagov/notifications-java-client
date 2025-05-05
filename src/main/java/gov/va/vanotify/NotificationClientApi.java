@@ -43,7 +43,7 @@ public interface NotificationClientApi {
     /**
      * The sendPushBroadcast method will create an HTTPS POST request. A JWT token will be created and added as an Authorization header to the request.
      *
-     * @param pushBroadcastRequest  Push request built using fluent builder API.
+     * @param pushBroadcastRequest  Push broadcast request built using fluent builder API.
      * {@link PushBroadcastRequest.Builder}
      *
      * @return <code>SendPushResponse</code>

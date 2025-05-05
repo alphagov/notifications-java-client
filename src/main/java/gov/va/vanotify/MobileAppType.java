@@ -1,8 +1,12 @@
 package gov.va.vanotify;
 
+import java.util.Arrays;
+
 public enum MobileAppType {
     VETEXT,
     VA_FLAGSHIP_APP;
+
+    public static final String ALLOWED_VALUES = Arrays.toString(MobileAppType.values());
 
     public static MobileAppType from(String value) {
         if (value == null) {
@@ -12,7 +16,7 @@ public enum MobileAppType {
             return MobileAppType.valueOf(value.trim().toUpperCase());
         } catch (IllegalArgumentException ex) {
             throw new IllegalArgumentException(
-                "Invalid MobileAppType: " + value + ". Allowed values: VETEXT, VA_FLAGSHIP_APP"
+                "Invalid MobileAppType: " + value + ". Allowed values: " + ALLOWED_VALUES
             );
         }
     }
