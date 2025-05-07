@@ -16,7 +16,9 @@ public abstract class NotificationRequest {
         this.billingCode = builder.billingCode;
         this.recipientIdentifier = builder.recipientIdentifier;
 
-        if (this.templateId == null || this.templateId.isEmpty()) throw new IllegalStateException("Missing templateId");
+        if (this.templateId == null || this.templateId.isEmpty()) {
+            throw new IllegalStateException("Missing templateId");
+        }
     }
 
     public String getTemplateId() {
@@ -121,6 +123,7 @@ public abstract class NotificationRequest {
          * {@link SmsRequest.Builder}
          * {@link EmailRequest.Builder}
          *
+         * @return a fully constructed NotificationRequest
          * @throws IllegalStateException if any required fields are missing
          */
         public abstract T build();

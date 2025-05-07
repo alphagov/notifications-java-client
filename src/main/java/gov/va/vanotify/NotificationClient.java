@@ -18,6 +18,7 @@ import java.net.URL;
 import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 import java.util.Properties;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -36,58 +37,59 @@ public class NotificationClient implements NotificationClientApi {
     private final Proxy proxy;
     private final String version;
 
+    // === Legacy API key format (concatenated API key) constructors ===
+
     /**
-     * This client constructor given the api key.
-     * @param apiKey Generate an API key by signing in to GOV.UK Notify, https://notifications.va.gov, and going to the **API integration** page
+     * Constructs a NotificationClient using the legacy concatenated API key format.
+     * Defaults to the live VA Notify base URL with no proxy.
+     * 
+     * Note: To get an API key, sign in to [VANotify](https://notifications.va.gov/) and go to the **API integration** page.
+     *
+     * @param apiKey Legacy API key in the format: (key-label)-(service-id)-(api-key)
      */
     public NotificationClient(final String apiKey) {
-        this(
-                apiKey,
-                LIVE_BASE_URL,
-                null
-        );
+        this(apiKey, LIVE_BASE_URL, null);
     }
 
     /**
-     * Use this client constructor if you require a proxy for https requests.
-     * @param apiKey Generate an API key by signing in to GOV.UK Notify, https://notifications.va.gov, and going to the **API integration** page
-     * @param proxy Proxy used on the http requests
+     * Constructs a NotificationClient using the legacy concatenated API key format and a proxy.
+     * Defaults to the live VA Notify base URL.
+     * 
+     * Note: To get an API key, sign in to [VANotify](https://notifications.va.gov/) and go to the **API integration** page.
+     *
+     * @param apiKey Legacy API key in the format: (key-label)-(service-id)-(api-key)
+     * @param proxy  HTTP proxy to use for outbound HTTPS requests
      */
     public NotificationClient(final String apiKey, final Proxy proxy) {
-        this(
-                apiKey,
-                LIVE_BASE_URL,
-                proxy
-        );
+        this(apiKey, LIVE_BASE_URL, proxy);
     }
 
     /**
-     * This client constructor is used for testing on other environments, used by the GOV.UK Notify team.
-     * @param apiKey Generate an API key by signing in to GOV.UK Notify, https://notifications.va.gov, and going to the **API integration** page
-     * @param baseUrl base URL, defaults to https://api.notifications.va.gov
+     * Constructs a NotificationClient using the legacy concatenated API key format and a custom base URL.
+     * 
+     * Note: To get an API key, sign in to [VANotify](https://notifications.va.gov/) and go to the **API integration** page.
+     *
+     * @param apiKey  Legacy API key in the format: (key-label)-(service-id)-(api-key)
+     * @param baseUrl Custom base URL (e.g., for testing or staging environments)
      */
     public NotificationClient(final String apiKey, final String baseUrl) {
-        this(
-                apiKey,
-                baseUrl,
-                null
-        );
+        this(apiKey, baseUrl, null);
     }
 
-
     /**
+     * Constructs a NotificationClient using the legacy concatenated API key format,
+     * with custom base URL and proxy settings.
+     * 
+     * Note: To get an API key, sign in to [VANotify](https://notifications.va.gov/) and go to the **API integration** page.
      *
-     * @param apiKey Generate an API key by signing in to GOV.UK Notify, https://notifications.va.gov, and going to the **API integration** page
-     * @param baseUrl base URL, defaults to https://api.notifications.va.gov
-     * @param proxy Proxy used on the http requests
+     * This constructor also attempts to set a default SSL context.
+     *
+     * @param apiKey  Legacy API key in the format: (key-label)-(service-id)-(api-key)
+     * @param baseUrl Custom base URL (e.g., for testing or staging environments)
+     * @param proxy   HTTP proxy to use for outbound HTTPS requests
      */
     public NotificationClient(final String apiKey, final String baseUrl, final Proxy proxy) {
-        this(
-                apiKey,
-                baseUrl,
-                proxy,
-                null
-        );
+        this(apiKey, baseUrl, proxy, null);
         try {
             setDefaultSSLContext();
         } catch (NoSuchAlgorithmException e) {
@@ -95,16 +97,118 @@ public class NotificationClient implements NotificationClientApi {
         }
     }
 
-    public NotificationClient(final String apiKey,
-                              final String baseUrl,
-                              final Proxy proxy,
-                              final SSLContext sslContext){
+    /**
+     * Primary constructor for legacy API key format.
+     * Parses the service ID and API key from the concatenated legacy API key format.
+     * 
+     * Note: To get an API key, sign in to [VANotify](https://notifications.va.gov/) and go to the **API integration** page.
+     *
+     * @param apiKey       Legacy API key in the format: (key-label)-(service-id)-(api-key)
+     * @param baseUrl      Target Notify API base URL
+     * @param proxy        Optional HTTP proxy
+     * @param sslContext   Optional custom SSL context (if null, caller must call fallback method)
+     */
+    public NotificationClient(
+            final String apiKey,
+            final String baseUrl,
+            final Proxy proxy,
+            final SSLContext sslContext) {
 
         this.apiKey = extractApiKey(apiKey);
         this.serviceId = extractServiceId(apiKey);
         this.baseUrl = baseUrl;
         this.proxy = proxy;
-        if (sslContext != null){
+        if (sslContext != null) {
+            setCustomSSLContext(sslContext);
+        }
+        this.version = getVersion();
+    }
+
+    // === New API key format (separate service ID + API key) constructors ===
+
+    /**
+     * Constructs a NotificationClient using separate service ID and API key.
+     * Defaults to the live VA Notify base URL with no proxy.
+     * 
+     * Note: To get an API key, sign in to [VANotify](https://notifications.va.gov/) and go to the **API integration** page.
+     *
+     * @param serviceId UUID of the Notify service
+     * @param apiKey    Long API key string associated with the service
+     */
+    public NotificationClient(final UUID serviceId, final String apiKey) {
+        this(serviceId, apiKey, LIVE_BASE_URL, null);
+    }
+
+    /**
+     * Constructs a NotificationClient using a service ID, API key, and proxy.
+     * Defaults to the live VA Notify base URL.
+     * 
+     * Note: To get an API key, sign in to [VANotify](https://notifications.va.gov/) and go to the **API integration** page.
+     *
+     * @param serviceId UUID of the Notify service
+     * @param apiKey    API key string
+     * @param proxy     HTTP proxy to use for outbound HTTPS requests
+     */
+    public NotificationClient(final UUID serviceId, final String apiKey, final Proxy proxy) {
+        this(serviceId, apiKey, LIVE_BASE_URL, proxy);
+    }
+
+    /**
+     * Constructs a NotificationClient using a service ID, API key, and custom base URL.
+     * 
+     * Note: To get an API key, sign in to [VANotify](https://notifications.va.gov/) and go to the **API integration** page.
+     *
+     * @param serviceId UUID of the Notify service
+     * @param apiKey    API key string
+     * @param baseUrl   Custom base URL (e.g., for testing or staging environments)
+     */
+    public NotificationClient(final UUID serviceId, final String apiKey, final String baseUrl) {
+        this(serviceId, apiKey, baseUrl, null);
+    }
+
+    /**
+     * Constructs a NotificationClient using a service ID, API key, base URL, and proxy.
+     * This constructor also attempts to set a default SSL context.
+     * 
+     * Note: To get an API key, sign in to [VANotify](https://notifications.va.gov/) and go to the **API integration** page.
+     *
+     * @param serviceId UUID of the Notify service
+     * @param apiKey    API key string
+     * @param baseUrl   Custom base URL
+     * @param proxy     HTTP proxy
+     */
+    public NotificationClient(final UUID serviceId, final String apiKey, final String baseUrl, final Proxy proxy) {
+        this(serviceId, apiKey, baseUrl, proxy, null);
+        try {
+            setDefaultSSLContext();
+        } catch (NoSuchAlgorithmException e) {
+            LOGGER.log(Level.SEVERE, e.toString(), e);
+        }
+    }
+
+    /**
+     * Primary constructor for new service ID + API key format.
+     * 
+     * Note: To get an API key, sign in to [VANotify](https://notifications.va.gov/) and go to the **API integration** page.
+     *
+     * @param serviceId   UUID of the Notify service
+     * @param apiKey      API key string
+     * @param baseUrl     Target Notify API base URL
+     * @param proxy       Optional HTTP proxy
+     * @param sslContext  Optional custom SSL context
+     */
+    public NotificationClient(
+            final UUID serviceId,
+            final String apiKey,
+            final String baseUrl,
+            final Proxy proxy,
+            final SSLContext sslContext) {
+
+        this.apiKey = apiKey;
+        this.serviceId = serviceId.toString();
+        this.baseUrl = baseUrl;
+        this.proxy = proxy;
+        if (sslContext != null) {
             setCustomSSLContext(sslContext);
         }
         this.version = getVersion();
@@ -140,6 +244,18 @@ public class NotificationClient implements NotificationClientApi {
         HttpURLConnection conn = createConnectionAndSetHeaders(baseUrl + "/v2/notifications/sms", "POST");
         String response = performPostRequest(conn, gsonInstance.toJson(smsRequest), HttpsURLConnection.HTTP_CREATED);
         return gsonInstance.fromJson(response, SendSmsResponse.class);
+    }
+
+    public SendPushResponse sendPush(PushRequest pushRequest) throws NotificationClientException {        
+        HttpURLConnection conn = createConnectionAndSetHeaders(baseUrl + "/v2/notifications/push", "POST");
+        String response = performPostRequest(conn, gsonInstance.toJson(pushRequest), HttpsURLConnection.HTTP_CREATED);
+        return gsonInstance.fromJson(response, SendPushResponse.class);
+    }
+
+    public SendPushResponse sendPushBroadcast(PushBroadcastRequest pushBroadcastRequest) throws NotificationClientException {        
+        HttpURLConnection conn = createConnectionAndSetHeaders(baseUrl + "/v2/notifications/push/broadcast", "POST");
+        String response = performPostRequest(conn, gsonInstance.toJson(pushBroadcastRequest), HttpsURLConnection.HTTP_CREATED);
+        return gsonInstance.fromJson(response, SendPushResponse.class);
     }
 
     public SendLetterResponse sendLetter(String templateId, Map<String, ?> personalisation, String reference) throws NotificationClientException {

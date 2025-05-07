@@ -1,3 +1,34 @@
+## 3.1.0
+* Added push requests
+
+```java
+SendPushResponse response = client.sendPush(new PushRequest.Builder()
+        .withTemplateId("vetext_template_id")
+        .withRecipientIdentifier(new Identifier(IdentifierType.ICN, "ICN_identifier"))
+        .withPersonalisation(personalisation)
+        .build()
+);
+```
+
+* Added push/broadcast requests
+
+```java
+SendPushResponse response = client.sendPushBroadcast(new PushBroadcastRequest.Builder()
+        .withTemplateId("vetext_template_id")
+        .withTopicSID("topic_id")
+        .withPersonalisation(personalisation)
+        .build()
+);
+```
+
+* Added support for newer API key format
+Newer API keys are not a concatenation of the key and service ID
+If you get a new API key, use the client constructores that require both service ID (UUID) and the API key
+
+```java
+public NotificationClient(final UUID serviceId, final String apiKey)
+```
+
 ## 3.0.0
 * Removed the optional "email_reply_to_id" attribute of the request data for the endpoint /v2/notifications/email.  The server no longer accepts this attribute.
 

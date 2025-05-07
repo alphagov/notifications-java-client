@@ -21,7 +21,8 @@ import static org.mockito.Mockito.*;
 
 public class NotificationClientTest {
 
-    private final String serviceId = UUID.randomUUID().toString();
+    private final UUID serviceUUID = UUID.randomUUID();
+    private final String serviceId = serviceUUID.toString();
     private final String apiKey = UUID.randomUUID().toString();
     private final String combinedApiKey = "Api_key_name-" +serviceId + "-" + apiKey;
     private final String baseUrl = "https://api.notifications.va.gov";
@@ -30,18 +31,10 @@ public class NotificationClientTest {
     public void testCreateNotificationClient_withSingleApiKeyAndBaseUrl(){
         NotificationClient client = new NotificationClient(combinedApiKey, baseUrl);
         assertNotificationClient(client);
-
     }
 
     @Test
     public void testCreateNotificationClient_withSingleApiKeyAndProxy() {
-        Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("10.0.0.1", 8080));
-        NotificationClient client = new NotificationClient(combinedApiKey, baseUrl, proxy);
-        assertNotificationWithProxy(proxy, client);
-    }
-
-    @Test
-    public void testCreateNotificationClient_withSingleApiKeyServiceIdAndProxy() {
         Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("10.0.0.1", 8080));
         NotificationClient client = new NotificationClient(combinedApiKey, baseUrl, proxy);
         assertNotificationWithProxy(proxy, client);
@@ -59,7 +52,33 @@ public class NotificationClientTest {
         SSLContext sslContext = SSLContext.getDefault();
         NotificationClient client = new NotificationClient(combinedApiKey, baseUrl, null, sslContext);
         assertNotificationClient(client);
+    }
 
+    @Test
+    public void testCreateNotificationClient_withServiceAndApiKeyAndBaseUrl(){
+        NotificationClient client = new NotificationClient(serviceUUID, apiKey, baseUrl);
+        assertNotificationClient(client);
+    }
+
+    @Test
+    public void testCreateNotificationClient_withServiceAndApiKeyAndProxy() {
+        Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("10.0.0.1", 8080));
+        NotificationClient client = new NotificationClient(serviceUUID, apiKey, baseUrl, proxy);
+        assertNotificationWithProxy(proxy, client);
+    }
+
+    @Test
+    public void testCreateNotification_withServiceAndApiKeyAndSetsUserAgent() {
+        NotificationClient client = new NotificationClient(serviceUUID, apiKey, baseUrl);
+        assertTrue(client.getUserAgent().contains("NOTIFY-API-JAVA-CLIENT/"));
+        assertTrue(client.getUserAgent().contains(client.getVersion()));
+    }
+
+    @Test
+    public void testCreateNotificationClient_withServiceAndApiKeyAndSSLContext() throws NoSuchAlgorithmException {
+        SSLContext sslContext = SSLContext.getDefault();
+        NotificationClient client = new NotificationClient(serviceUUID, apiKey, baseUrl, null, sslContext);
+        assertNotificationClient(client);
     }
 
     private void assertNotificationWithProxy(Proxy proxy, NotificationClient client) {

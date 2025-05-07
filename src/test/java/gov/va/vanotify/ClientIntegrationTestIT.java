@@ -18,6 +18,12 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Integration testing assumes the following templates with single personalization
+ * Email: "Hello ((name))\n\nThis is just a test."
+ * SMS: "This is a test SMS message for ((name)). Test edit"
+*/
+
 public class ClientIntegrationTestIT {
 
     @Test
@@ -48,6 +54,39 @@ public class ClientIntegrationTestIT {
         assertPdfResponse(client, notificationId);
     }
 
+    @Test
+    public void sendPushAndAssertResponse() throws NotificationClientException {
+        NotificationClient client = getClient();
+        HashMap<String, Object> personalisation = new HashMap<>();
+        String appointment_date = "12/02/2025";
+        String appointment_time = "10:00";
+        personalisation.put("appointment_date", appointment_date);
+        personalisation.put("appointment_time", appointment_time);
+        Identifier identifier = new Identifier(IdentifierType.ICN, System.getenv("VETEXT_RECIPIENT_ICN"));
+        SendPushResponse response = client.sendPush(new PushRequest.Builder()
+                .withTemplateId(System.getenv("VETEXT_TEMPLATE_ID"))
+                .withRecipientIdentifier(identifier)
+                .withPersonalisation(personalisation)
+                .build()
+        );
+        assertEquals("success", response.getResult());
+    }
+
+    @Test
+    public void sendPushBroadcastAndAssertResponse() throws NotificationClientException {
+        NotificationClient client = getClient();
+        HashMap<String, Object> personalisation = new HashMap<>();
+        String message = "foo";
+        personalisation.put("message", message);
+        SendPushResponse response = client.sendPushBroadcast(new PushBroadcastRequest.Builder()
+                .withMobileApp(MobileAppType.VA_FLAGSHIP_APP)
+                .withTemplateId(System.getenv("VETEXT_TEMPLATE_ID"))
+                .withTopicSID(UUID.randomUUID().toString())
+                .withPersonalisation(personalisation)
+                .build()
+        );
+        assertEquals("success", response.getResult());
+    }    
 
     @Disabled("This test fails because the API Dev environment doesn't return any notifications.  This route is not exposed to users via Postman.")
     @Test
@@ -369,15 +408,21 @@ public class ClientIntegrationTestIT {
     }
 
     private NotificationClient getClient(){
-        String apiKey = System.getenv("API_KEY");
-        String baseUrl = System.getenv("NOTIFY_API_URL");
-        return new NotificationClient(apiKey, baseUrl);
+        return getClient("API_KEY");
     }
 
     private NotificationClient getClient(String api_key){
         String apiKey = System.getenv(api_key);
         String baseUrl = System.getenv("NOTIFY_API_URL");
-        return new NotificationClient(apiKey, baseUrl);
+        String serviceId = System.getenv("SERVICE_ID");
+        
+        if (serviceId == null || serviceId.isEmpty()){
+            // old format API key
+            return new NotificationClient(apiKey, baseUrl);
+        } else {
+            // new format API key
+            return new NotificationClient(UUID.fromString(serviceId), apiKey, baseUrl);
+        }
     }
 
     private SendEmailResponse sendEmailAndAssertResponse(final NotificationClient client) throws NotificationClientException {
@@ -413,7 +458,7 @@ public class ClientIntegrationTestIT {
         assertNotificationSmsResponse(response, uniqueName, billingCode);
         return response;
     }
-
+    
     private SendLetterResponse sendLetterAndAssertResponse(final NotificationClient client) throws NotificationClientException {
         HashMap<String, String> personalisation = new HashMap<>();
         String addressLine1 = UUID.randomUUID().toString();
@@ -429,7 +474,7 @@ public class ClientIntegrationTestIT {
 
     private void assertNotificationSmsResponse(final SendSmsResponse response, final String uniqueName, String billingCode){
         assertNotNull(response);
-        assertTrue(response.getBody().contains(uniqueName));
+        assertTrue(response.getBody().contains("<redacted>"), "personalization should be redacted");
         assertEquals(Optional.of(uniqueName), response.getReference());
         assertEquals(Optional.ofNullable(billingCode), response.getBillingCode());
         assertNotNull(response.getNotificationId());

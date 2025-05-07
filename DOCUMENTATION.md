@@ -17,11 +17,30 @@ Refer to the [client changelog](https://github.com/department-of-veterans-affair
 
 ### Create a new instance of the client
 
-Add this code to your application:
+There are currently two formats for API keys.
+
+- An older format comprised of a concatenation of an optional label, the service ID (UUID formatted), and the actual API key (UUID formatted).
+
+- A new format that is just the API key as a string
+
+The new format requires the service ID (UUID format) to be passed into the constructor as compared to being parsed from the older concatenated key format.
+
+There are equivalent constructors for both the older and newer format keys with the new constructors requiring the serviceId.
+
+Add this code to your application for older keys:
 
 ```java
 import gov.va.vanotify.NotificationClient;
 NotificationClient client = new NotificationClient(apiKey);
+```
+
+Add this code to your application for newer keys:
+
+- *Note* that the serviceId is expected to be a UUID
+
+```java
+import gov.va.vanotify.NotificationClient;
+NotificationClient client = new NotificationClient(serviceId, apiKey)
 ```
 
 To get an API key, [sign in to VANotify](https://notifications.va.gov) and go to the __API integration__ page. You can find more information in the [API keys](#api-keys) section of this documentation.
@@ -31,6 +50,13 @@ If you use a proxy you can pass it into the NotificationClient constructor.
 ```java
 import gov.va.vanotify.NotificationClient;
 NotificationClient client = new NotificationClient(apiKey, proxy);
+```
+
+or
+
+```java
+import gov.va.vanotify.NotificationClient;
+NotificationClient client = new NotificationClient(serviceId, apiKey, proxy);
 ```
 
 ## Send a message
@@ -526,6 +552,208 @@ If the request is not successful, the client returns a `NotificationClientExcept
 |#`permanent-failure`|The provider could not deliver the message. This can happen if the phone number was wrong or if the network operator rejects the message. If you’re sure that these phone numbers are correct, you should [contact VANotify support](https://notifications.va.gov/support). If not, you should remove them from your database. You’ll still be charged for text messages that cannot be delivered.
 |#`temporary-failure`|The provider could not deliver the message. This can happen when the recipient’s phone is off, has no signal, or their text message inbox is full. You can try to send the message again. You’ll still be charged for text messages to phones that are not accepting messages.|
 |#`technical-failure`|Your message was not sent because there was a problem between Notify and the provider.<br>You’ll have to try sending your messages again. You will not be charged for text messages that are affected by a technical failure.|
+
+## Send a PUSH notification
+
+VANotify supports two types of push notifications:
+
+- Targeted push to a specific user via their ICN (PushRequest)
+
+- Broadcast push to all subscribers of a topic (PushBroadcastRequest)
+
+### Onboarding
+
+Teams that want to send push notifications to the mobile app need to get an approved template and a corresponding template id for that approved template. They also need to apply to the VA Notify team for a service id for their application and a service api key so they can make calls to the notify platform.
+
+Requirements:
+
+Any team that wants to send push notifications to the mobile app need to have:
+
+- Template ID for the message going to the user
+
+  - Note - The template ID here is stored in VeText, NOT IN NOTIFY.
+
+- ICN of the Vetaran
+
+- Service API Key - notify platform api key generated for the notification send requester
+
+- Service ID - notify platform service id for this application
+
+### Send a targeted push notification
+
+Use this when sending a notification to a single individual identified by their ICN.
+
+#### Method
+
+```java
+SendPushResponse response = client.sendPush(
+    new PushRequest.Builder()
+        .withTemplateId(templateId)
+        .withRecipientIdentifier(new Identifier(IdentifierType.ICN, "1234567890V123456"))
+        .withPersonalisation(personalisation)
+        .build()
+);
+```
+
+#### Arguments
+
+##### templateId (required)
+
+Template ID for the push message
+
+_Note - The template ID here is stored in VeText, NOT IN NOTIFY_
+
+##### recipientIdentifier (required)
+
+ICN recipient identifier of the Vetaran
+
+##### personalisation (required)
+
+If a template has placeholder fields for personalised information such as name or application date, you must provide their values in a map. For example:
+
+```java
+Map<String, Object> personalisation = new HashMap<>();
+personalisation.put("first_name", "Amala");
+personalisation.put("application_date", "2018-01-01");
+```
+
+If a template does not have any placeholder fields for personalised information, you must pass in an empty map or `null`.
+
+#### mobileApp (optional)
+
+This defaults to `MobileAppType.VA_FLAGSHIP_APP` which is the only currently supported app.
+
+```java
+    new PushRequest.Builder()
+        ...
+        .withMobileApp(MobileAppType mobileApp)
+        ...
+```
+
+#### Validation
+
+Throws IllegalStateException if:
+
+- templateId is null or emtpy
+
+- recipientIdentifier is null
+
+- recipientIdentifier is not of type ICN
+
+#### Response
+
+Both sendPush and sendPushBroadcast return a SendPushResponse:
+
+```java
+SendPushResponse {
+    private final String result;
+}
+```
+
+result string contains either 'success' or a failure message
+
+- *Note* This success only means the request was successfully handed off for sending to the mobile app. it does NOT mean that the push was successfully received on the device.
+
+#### Error codes
+
+If the request is not successful, the client returns a `NotificationClientException` containing the relevant error code:
+
+|httpResult|Message|How to fix|
+|:---|:---|:---|
+|`400`|`[{`<br>`"error": "BadRequestError",`<br>`"message": "Can't send to this recipient using a team-only API key"`<br>`}]`|Use the correct type of [API key](#api-keys)|
+|`400`|`[{`<br>`"error": "BadRequestError",`<br>`"message": "Can't send to this recipient when service is in trial mode - see https://notifications.va.gov"`<br>`}]`|Your service cannot send this notification in trial mode|
+|`403`|`[{`<br>`"error": "AuthError",`<br>`"message": "Error: Your system clock must be accurate to within 30 seconds"`<br>`}]`|Check your system clock|
+|`403`|`[{`<br>`"error": "AuthError",`<br>`"message": "Invalid token: API key not found"`<br>`}]`|Use the correct API key. Refer to [API keys](#api-keys) for more information|
+|`429`|`[{`<br>`"error": "RateLimitError",`<br>`"message": "Exceeded rate limit for key type TEAM/TEST/LIVE of 3000 requests per 60 seconds"`<br>`}]`|Refer to [API rate limits](#rate-limits) for more information|
+|`429`|`[{`<br>`"error": "TooManyRequestsError",`<br>`"message": "Exceeded send limits (LIMIT NUMBER) for today"`<br>`}]`|Refer to [service limits](#daily-limits) for the limit number|
+|`500`|`[{`<br>`"error": "Exception",`<br>`"message": "Internal server error"`<br>`}]`|Notify was unable to process the request, resend your notification|
+
+### Send a broadcast push notification
+
+Use this when sending a message to all subscribers of a specific topic.
+
+#### Method
+
+```java
+SendPushResponse response = client.sendPushBroadcast(
+    new PushBroadcastRequest.Builder()
+        .withTemplateId(templateId)
+        .withTopicSID("topic_sid_example")
+        .withPersonalisation(personalisation)
+        .build()
+);
+```
+
+#### Arguments
+
+##### templateId (required)
+
+Template ID for the push message
+
+_Note - The template ID here is stored in VeText, NOT IN NOTIFY_
+
+##### topicSID (required)
+
+The identifier of the push broadcast topic
+
+##### personalisation (required)
+
+If a template has placeholder fields for personalised information such as name or application date, you must provide their values in a map. For example:
+
+```java
+Map<String, Object> personalisation = new HashMap<>();
+personalisation.put("first_name", "Amala");
+personalisation.put("application_date", "2018-01-01");
+```
+
+If a template does not have any placeholder fields for personalised information, you must pass in an empty map or `null`.
+
+#### mobileApp (optional)
+
+This defaults to `MobileAppType.VA_FLAGSHIP_APP` which is the only currently supported app.
+
+```java
+    new PushRequest.Builder()
+        ...
+        .withMobileApp(MobileAppType mobileApp)
+        ...
+```
+
+#### Validation
+
+Throws IllegalStateException if:
+
+- templateId is null or emtpy
+
+- topicSID is null or empty
+
+#### Response
+
+Both sendPush and sendPushBroadcast return a SendPushResponse:
+
+```java
+SendPushResponse {
+    private final String result;
+}
+```
+
+result string contains either 'success' or a failure message
+
+- *Note* This success only means the request was successfully handed off for sending to the mobile app. it does NOT mean that the push was successfully received on the device.
+
+#### Error codes
+
+If the request is not successful, the client returns a `NotificationClientException` containing the relevant error code:
+
+|httpResult|Message|How to fix|
+|:---|:---|:---|
+|`400`|`[{`<br>`"error": "BadRequestError",`<br>`"message": "Can't send to this recipient using a team-only API key"`<br>`}]`|Use the correct type of [API key](#api-keys)|
+|`400`|`[{`<br>`"error": "BadRequestError",`<br>`"message": "Can't send to this recipient when service is in trial mode - see https://notifications.va.gov"`<br>`}]`|Your service cannot send this notification in trial mode|
+|`403`|`[{`<br>`"error": "AuthError",`<br>`"message": "Error: Your system clock must be accurate to within 30 seconds"`<br>`}]`|Check your system clock|
+|`403`|`[{`<br>`"error": "AuthError",`<br>`"message": "Invalid token: API key not found"`<br>`}]`|Use the correct API key. Refer to [API keys](#api-keys) for more information|
+|`429`|`[{`<br>`"error": "RateLimitError",`<br>`"message": "Exceeded rate limit for key type TEAM/TEST/LIVE of 3000 requests per 60 seconds"`<br>`}]`|Refer to [API rate limits](#rate-limits) for more information|
+|`429`|`[{`<br>`"error": "TooManyRequestsError",`<br>`"message": "Exceeded send limits (LIMIT NUMBER) for today"`<br>`}]`|Refer to [service limits](#daily-limits) for the limit number|
+|`500`|`[{`<br>`"error": "Exception",`<br>`"message": "Internal server error"`<br>`}]`|Notify was unable to process the request, resend your notification|
 
 ## Get a template
 
