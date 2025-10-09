@@ -8,6 +8,7 @@ public abstract class NotificationRequest {
     protected final String reference;
     protected final String billingCode;
     protected final Identifier recipientIdentifier;
+    protected final String callbackUrl;
 
     protected NotificationRequest(Builder builder) {
         this.templateId = builder.templateId;
@@ -15,6 +16,7 @@ public abstract class NotificationRequest {
         this.reference = builder.reference;
         this.billingCode = builder.billingCode;
         this.recipientIdentifier = builder.recipientIdentifier;
+        this.callbackUrl = builder.callbackUrl;
 
         if (this.templateId == null || this.templateId.isEmpty()) {
             throw new IllegalStateException("Missing templateId");
@@ -41,6 +43,10 @@ public abstract class NotificationRequest {
         return recipientIdentifier;
     }
 
+    public String getCallbackUrl() {
+        return callbackUrl;
+    }
+
     public abstract static class Builder<T extends NotificationRequest, B extends Builder> {
         protected String templateId;
         protected String recipient;
@@ -48,6 +54,7 @@ public abstract class NotificationRequest {
         protected String reference;
         protected String billingCode;
         protected Identifier recipientIdentifier;
+        protected String callbackUrl;
 
         protected abstract B getInstance();
 
@@ -101,6 +108,18 @@ public abstract class NotificationRequest {
          */
         public B withBillingCode(String billingCode) {
             this.billingCode = billingCode;
+            return this.getInstance();
+        }
+
+        /**
+         * Sets <b>optional</b> callback URL.
+         *
+         * @param callbackUrl   A URL to which delivery status updates are sent.
+         *                      Must be a valid URI with a maximum length of 255 characters.
+         * @return reference to itself (builder)
+         */
+        public B withCallbackUrl(String callbackUrl) {
+            this.callbackUrl = callbackUrl;
             return this.getInstance();
         }
 
