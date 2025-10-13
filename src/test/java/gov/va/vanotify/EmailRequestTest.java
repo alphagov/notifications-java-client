@@ -75,6 +75,7 @@ public class EmailRequestTest {
             put("foo", "bar");
         }};
         Identifier identifier = new Identifier(IdentifierType.ICN, "1234");
+        String callbackUrl = "https://example.com/callback";
 
 
         EmailRequest request = new EmailRequest.Builder()
@@ -84,6 +85,7 @@ public class EmailRequestTest {
                 .withBillingCode(billingCode)
                 .withPersonalisation(personalisation)
                 .withRecipientIdentifier(identifier)
+                .withCallbackUrl(callbackUrl)
                 .build();
 
         JsonObject actual = gsonInstance.toJsonTree(request).getAsJsonObject();
@@ -94,5 +96,6 @@ public class EmailRequestTest {
         assertEquals("bar", actual.getAsJsonObject("personalisation").get("foo").getAsString());
         assertEquals("ICN", actual.getAsJsonObject("recipient_identifier").get("id_type").getAsString());
         assertEquals(identifier.getValue(), actual.getAsJsonObject("recipient_identifier").get("id_value").getAsString());
+        assertEquals(callbackUrl, actual.getAsJsonObject("callback_url").getAsString());
     }
 }

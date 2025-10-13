@@ -4,11 +4,13 @@ import java.util.Map;
 
 public abstract class NotificationPushRequest {
     protected final MobileAppType mobileApp;
+    protected final String callbackUrl;
     protected final String templateId;
     protected final Map<String, ?> personalisation;
 
     protected NotificationPushRequest(Builder builder) {
         this.mobileApp = builder.mobileApp;
+        this.callbackUrl = builder.callbackUrl;
         this.templateId = builder.templateId;
         this.personalisation = builder.personalisation;
 
@@ -21,6 +23,10 @@ public abstract class NotificationPushRequest {
         return mobileApp;
     }
 
+    public String getCallbackUrl() {
+        return callbackUrl;
+    }
+
     public String getTemplateId() {
         return templateId;
     }
@@ -31,6 +37,7 @@ public abstract class NotificationPushRequest {
 
     public abstract static class Builder<T extends NotificationPushRequest, B extends Builder> {        
         protected MobileAppType mobileApp = MobileAppType.VA_FLAGSHIP_APP;
+        protected String callbackUrl;
         protected String templateId;
         protected Map<String, ?> personalisation;
 
@@ -44,6 +51,18 @@ public abstract class NotificationPushRequest {
          */
         public B withMobileApp(MobileAppType mobileApp) {
             this.mobileApp = mobileApp;
+            return this.getInstance();
+        }
+
+        /**
+         * Sets <b>optional</b> callback URL.
+         *
+         * @param callbackUrl   A URL to which delivery status updates are sent.
+         *                      Must be a valid URI with a maximum length of 255 characters.
+         * @return reference to itself (builder)
+         */
+        public B withCallbackUrl(String callbackUrl) {
+            this.callbackUrl = callbackUrl;
             return this.getInstance();
         }
 

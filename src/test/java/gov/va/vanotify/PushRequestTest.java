@@ -80,19 +80,22 @@ public class PushRequestTest {
     }
 
     @Test
-    public void shouldCreateRequestWithOptionalMobileApp() {
+    public void shouldCreateRequestWithOptionalFields() {
         Identifier identifier = new Identifier(IdentifierType.ICN, "1234");
         MobileAppType mobileApp = MobileAppType.VA_FLAGSHIP_APP;
+        String callbackUrl = "https://example.com/callback";
 
         PushRequest request = new PushRequest.Builder()
                     .withTemplateId("1234")
                     .withRecipientIdentifier(identifier)
                     .withMobileApp(mobileApp)
+                    .withCallbackUrl(callbackUrl)
                     .build();
         
         assertEquals("1234", request.getTemplateId());
         assertEquals(identifier, request.getRecipientIdentifier());
         assertEquals(mobileApp, request.getMobileApp());
+        assertEquals(callbackUrl, request.getCallbackUrl());
     }
 
     @Test
