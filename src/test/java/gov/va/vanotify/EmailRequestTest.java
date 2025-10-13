@@ -93,9 +93,9 @@ public class EmailRequestTest {
         assertEquals(emailAddress, actual.get("email_address").getAsString());
         assertEquals(reference, actual.get("reference").getAsString());
         assertEquals(billingCode, actual.get("billing_code").getAsString());
+        assertEquals(callbackUrl, actual.get("callback_url").getAsString());
         assertEquals("bar", actual.getAsJsonObject("personalisation").get("foo").getAsString());
         assertEquals("ICN", actual.getAsJsonObject("recipient_identifier").get("id_type").getAsString());
         assertEquals(identifier.getValue(), actual.getAsJsonObject("recipient_identifier").get("id_value").getAsString());
-        assertEquals(callbackUrl, actual.getAsJsonObject("callback_url").getAsString());
     }
 }
