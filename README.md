@@ -8,3 +8,5 @@ Useful links:
 - [Maven Central repository](https://search.maven.org/artifact/uk.gov.service.notify/notifications-java-client)
 - [Changelog](https://github.com/alphagov/notifications-java-client/blob/main/CHANGELOG.md)
 - [Contributing to this client](https://github.com/alphagov/notifications-java-client/blob/main/CONTRIBUTING.md)
+
+##
