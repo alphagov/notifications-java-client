@@ -1,3 +1,6 @@
+## 6.0.0-RELEASE
+* Remove Java 8, 9, and 10 from supported versions. This library only supports Java 11+ from now on.
+
 ## 5.2.1-RELEASE
 * Bump commons-io from 2.8.0 to 2.17.0
 
