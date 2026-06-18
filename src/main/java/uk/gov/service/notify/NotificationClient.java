@@ -22,6 +22,7 @@ import java.net.URL;
 import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 import java.util.Objects;
+import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -138,7 +139,7 @@ public class NotificationClient implements NotificationClientApi {
                                        String emailAddress,
                                        Map<String, ?> personalisation,
                                        String reference) throws NotificationClientException {
-        return sendEmail(templateId, emailAddress, personalisation, reference, "", null);
+        return sendEmail(templateId, emailAddress, personalisation, reference, "", null, null);
     }
 
     @Override
@@ -147,7 +148,7 @@ public class NotificationClient implements NotificationClientApi {
                                        Map<String, ?> personalisation,
                                        String reference,
                                        String emailReplyToId) throws NotificationClientException {
-        return sendEmail(templateId, emailAddress, personalisation, reference, emailReplyToId, null);
+        return sendEmail(templateId, emailAddress, personalisation, reference, emailReplyToId, null, null);
     }
 
     @Override
@@ -157,6 +158,18 @@ public class NotificationClient implements NotificationClientApi {
                                        String reference,
                                        String emailReplyToId,
                                        URI oneClickUnsubscribeURL) throws NotificationClientException {
+        return sendEmail(templateId, emailAddress, personalisation, reference, emailReplyToId, oneClickUnsubscribeURL, null);
+    }
+
+    @Override
+    public SendEmailResponse sendEmail(String templateId,
+                                       String emailAddress,
+                                       Map<String, ?> personalisation,
+                                       String reference,
+                                       String emailReplyToId,
+                                       URI oneClickUnsubscribeURL,
+                                       List<String> sanitiseContentFor) throws NotificationClientException {
+
 
         JSONObject body = createBodyForPostRequest(templateId,
                 null,
@@ -174,6 +187,11 @@ public class NotificationClient implements NotificationClientApi {
         if(oneClickUnsubscribeURL != null)
         {
             body.put("one_click_unsubscribe_url", oneClickUnsubscribeURL);
+        }
+
+        if(sanitiseContentFor != null)
+        {
+            body.put("sanitise_content_for", sanitiseContentFor);
         }
 
         HttpURLConnection conn = createConnectionAndSetHeaders(baseUrl + "/v2/notifications/email", "POST");

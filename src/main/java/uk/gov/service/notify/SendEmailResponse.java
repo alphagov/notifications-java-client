@@ -16,6 +16,7 @@ public class SendEmailResponse {
     private final String subject;
     private final String fromEmail;
     private final URI oneClickUnsubscribeURL;
+    private final JSONObject sanitisedContent;
 
     public SendEmailResponse(String response) {
         JSONObject data = new JSONObject(response);
@@ -30,6 +31,7 @@ public class SendEmailResponse {
         templateVersion = template.getInt("version");
         templateUri = template.getString("uri");
         oneClickUnsubscribeURL = data.isNull("one_click_unsubscribe_url") ? null : URI.create(data.getString("one_click_unsubscribe_url"));
+        sanitisedContent = data.isNull("sanitised_content") ? null : data.getJSONObject("sanitised_content");
     }
 
     public UUID getNotificationId() {
@@ -68,6 +70,10 @@ public class SendEmailResponse {
         return Optional.ofNullable(oneClickUnsubscribeURL);
     }
 
+    public Optional<JSONObject> getSanitisedContent() {
+        return Optional.ofNullable(sanitisedContent);
+    }
+
     @Override
     public String toString() {
         return "SendEmailResponse{" +
@@ -80,6 +86,7 @@ public class SendEmailResponse {
                 ", subject='" + subject + '\'' +
                 ", fromEmail='" + fromEmail + '\'' +
                 ", oneClickUnsubscribeURL=" + oneClickUnsubscribeURL +
+                ", sanitisedContent=" + sanitisedContent +
                 '}';
     }
 }
