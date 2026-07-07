@@ -1,3 +1,6 @@
+## 6.0.1-RELEASE
+* Upgrades `httpclient` to `httpclient5`
+
 ## 6.0.0-RELEASE
 * Remove Java 8, 9, and 10 from supported versions. This library only supports Java 11+ from now on.
 
