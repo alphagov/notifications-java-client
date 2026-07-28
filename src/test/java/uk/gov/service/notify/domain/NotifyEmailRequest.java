@@ -3,6 +3,7 @@ package uk.gov.service.notify.domain;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.net.URI;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -14,19 +15,24 @@ public class NotifyEmailRequest {
     private final String reference;
     private final String emailReplyToId;
     private final URI oneClickUnsubscribeURL;
+    private final List<String> sanitiseContentFor;
 
-    public NotifyEmailRequest(@JsonProperty("email_address") String emailAddress,
-                              @JsonProperty("template_id") String templateId,
-                              @JsonProperty("personalisation") Map<String, ?> personalisation,
-                              @JsonProperty("reference") String reference,
-                              @JsonProperty("email_reply_to_id") String emailReplyToId,
-                              @JsonProperty("one_click_unsubscribe_url") URI oneClickUnsubscribeURL) {
+    public NotifyEmailRequest(
+        @JsonProperty("email_address") String emailAddress,
+        @JsonProperty("template_id") String templateId,
+        @JsonProperty("personalisation") Map<String, ?> personalisation,
+        @JsonProperty("reference") String reference,
+        @JsonProperty("email_reply_to_id") String emailReplyToId,
+        @JsonProperty("one_click_unsubscribe_url") URI oneClickUnsubscribeURL,
+        @JsonProperty("sanitise_content_for") List<String> sanitiseContentFor
+    ) {
         this.emailAddress = emailAddress;
         this.templateId = templateId;
         this.personalisation = personalisation;
         this.reference = reference;
         this.emailReplyToId = emailReplyToId;
         this.oneClickUnsubscribeURL = oneClickUnsubscribeURL;
+        this.sanitiseContentFor = sanitiseContentFor;
     }
 
     @JsonProperty("email_address")
@@ -59,17 +65,24 @@ public class NotifyEmailRequest {
         return oneClickUnsubscribeURL;
     }
 
+    @JsonProperty("sanitise_content_for")
+    public List<String> getSanitiseContentFor() {
+        return sanitiseContentFor;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         NotifyEmailRequest request = (NotifyEmailRequest) o;
-        return Objects.equals(emailAddress, request.emailAddress) && Objects.equals(templateId, request.templateId) && Objects.equals(personalisation, request.personalisation) && Objects.equals(reference, request.reference) && Objects.equals(emailReplyToId, request.emailReplyToId) && Objects.equals(oneClickUnsubscribeURL, request.oneClickUnsubscribeURL);
+        return Objects.equals(emailAddress, request.emailAddress) && Objects.equals(templateId, request.templateId) && Objects.equals(personalisation, request.personalisation) && Objects.equals(reference, request.reference) && Objects.equals(emailReplyToId, request.emailReplyToId) && Objects.equals(oneClickUnsubscribeURL, request.oneClickUnsubscribeURL) && Objects.equals(sanitiseContentFor, request.sanitiseContentFor);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(emailAddress, templateId, personalisation, reference, emailReplyToId, oneClickUnsubscribeURL);
+        return Objects.hash(
+            emailAddress, templateId, personalisation, reference, emailReplyToId, oneClickUnsubscribeURL, sanitiseContentFor
+        );
     }
 
     @Override
@@ -81,6 +94,7 @@ public class NotifyEmailRequest {
                 ", reference='" + reference + '\'' +
                 ", emailReplyToId='" + emailReplyToId + '\'' +
                 ", oneClickUnsubscribeURL=" + oneClickUnsubscribeURL +
+                ", sanitiseContentFor=" + sanitiseContentFor +
                 '}';
     }
 }

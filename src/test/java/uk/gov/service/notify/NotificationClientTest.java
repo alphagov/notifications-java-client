@@ -45,6 +45,7 @@ import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -390,6 +391,44 @@ public class NotificationClientTest {
         assertEquals("aReference", requestReceivedByNotifyApi.getReference());
         assertEquals("an emailReplyToId", requestReceivedByNotifyApi.getEmailReplyToId());
         assertEquals(oneClickUnsubscribeURL, requestReceivedByNotifyApi.getOneClickUnsubscribeURL());
+    }
+
+    @Test
+    public void testSendEmailWithsanitiseContentFor() throws NotificationClientException, IOException {
+        NotifyEmailResponse expected = objectMapper.readValue(this.getClass().getClassLoader().getResourceAsStream("v2_notifications_email_sanitise_personalisation_response.json"), NotifyEmailResponse.class);
+        wireMockRule.stubFor(post("/v2/notifications/email")
+                .willReturn(created()
+                        .withResponseBody(new Body(objectMapper.writeValueAsString(expected)))));
+        NotificationClient client = new NotificationClient(COMBINED_API_KEY, BASE_URL);
+        // setting up this map can be replaced with Map.of() in later Java versions
+        Map<String, Object> personalisation = new HashMap<>();
+        personalisation.put("name", "Anne Example, now [click this evil link](https://evil.link)");
+        URI oneClickUnsubscribeURL = URI.create("http://localhost/unsubscribe");
+        String[] placeholdersToSanitise = {"name"};
+        List<String> sanitiseContentFor = Arrays.asList(placeholdersToSanitise);
+
+        SendEmailResponse actual = client.sendEmail("aTemplateId", "anEmailAddress", personalisation, "aReference", "an emailReplyToId", oneClickUnsubscribeURL, sanitiseContentFor);
+
+        assertEquals(expected.getNotificationId(), actual.getNotificationId());
+        assertEquals(expected.getReference(), actual.getReference().get());
+        assertEquals(expected.getContent().getBody(), actual.getBody());
+        assertEquals(expected.getContent().getSubject(), actual.getSubject());
+        assertEquals(expected.getContent().getFromEmail(), actual.getFromEmail().get());
+        // No notification uri in SendEmailResponse?
+//        assertEquals(expected.getUri(), actual.getUri());
+        assertEquals(expected.getTemplate().getId(), actual.getTemplateId());
+        assertEquals(expected.getTemplate().getVersion(), actual.getTemplateVersion());
+        assertEquals(expected.getTemplate().getUri().toString(), actual.getTemplateUri());
+        assertEquals(objectMapper.writeValueAsString(expected.getSanitisedContent()), actual.getSanitisedContent().orElseGet(JSONObject::new).toString());
+
+        LoggedRequest request = validateRequest();
+        NotifyEmailRequest requestReceivedByNotifyApi = objectMapper.readValue(request.getBodyAsString(), NotifyEmailRequest.class);
+        assertEquals("anEmailAddress", requestReceivedByNotifyApi.getEmailAddress());
+        assertEquals("aTemplateId", requestReceivedByNotifyApi.getTemplateId());
+        assertEquals(personalisation, requestReceivedByNotifyApi.getPersonalisation());
+        assertEquals("aReference", requestReceivedByNotifyApi.getReference());
+        assertEquals("an emailReplyToId", requestReceivedByNotifyApi.getEmailReplyToId());
+        assertEquals(sanitiseContentFor, requestReceivedByNotifyApi.getSanitiseContentFor());
     }
 
     @Test

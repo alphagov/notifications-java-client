@@ -1,3 +1,6 @@
+## 6.1.0-RELEASE
+* Add a `sanitiseContentFor` parameter to `sendEmail`, a list of placeholders, the content of which you want Notify to sanitise.
+
 ## 6.0.0-RELEASE
 * Remove Java 8, 9, and 10 from supported versions. This library only supports Java 11+ from now on.
 

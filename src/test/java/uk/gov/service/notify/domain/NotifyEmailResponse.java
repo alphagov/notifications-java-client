@@ -3,6 +3,7 @@ package uk.gov.service.notify.domain;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.net.URI;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -116,19 +117,24 @@ public class NotifyEmailResponse {
     private final URI uri;
     private final Template template;
     private final URI oneClickUnsubscribeURL;
+    private final Map<String, Map<String, String>> sanitisedContent;
 
-    public NotifyEmailResponse(@JsonProperty("id") UUID notificationId,
-                               @JsonProperty("reference") String reference,
-                               @JsonProperty("content") Content content,
-                               @JsonProperty("uri") URI uri,
-                               @JsonProperty("template") Template template,
-                               @JsonProperty("one_click_unsubscribe_url") URI oneClickUnsubscribeURL) {
+    public NotifyEmailResponse(
+        @JsonProperty("id") UUID notificationId,
+        @JsonProperty("reference") String reference,
+        @JsonProperty("content") Content content,
+        @JsonProperty("uri") URI uri,
+        @JsonProperty("template") Template template,
+        @JsonProperty("one_click_unsubscribe_url") URI oneClickUnsubscribeURL,
+        @JsonProperty("sanitised_content") Map<String, Map<String, String>> sanitisedContent
+    ) {
         this.notificationId = notificationId;
         this.reference = reference;
         this.content = content;
         this.uri = uri;
         this.template = template;
         this.oneClickUnsubscribeURL = oneClickUnsubscribeURL;
+        this.sanitisedContent = sanitisedContent;
     }
 
     @JsonProperty("id")
@@ -161,17 +167,22 @@ public class NotifyEmailResponse {
         return oneClickUnsubscribeURL;
     }
 
+    @JsonProperty("sanitised_content")
+    public Map<String, Map<String, String>> getSanitisedContent() {
+        return sanitisedContent;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         NotifyEmailResponse that = (NotifyEmailResponse) o;
-        return Objects.equals(notificationId, that.notificationId) && Objects.equals(reference, that.reference) && Objects.equals(content, that.content) && Objects.equals(uri, that.uri) && Objects.equals(template, that.template) && Objects.equals(oneClickUnsubscribeURL, that.oneClickUnsubscribeURL);
+        return Objects.equals(notificationId, that.notificationId) && Objects.equals(reference, that.reference) && Objects.equals(content, that.content) && Objects.equals(uri, that.uri) && Objects.equals(template, that.template) && Objects.equals(oneClickUnsubscribeURL, that.oneClickUnsubscribeURL) && Objects.equals(sanitisedContent, that.sanitisedContent);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(notificationId, reference, content, uri, template, oneClickUnsubscribeURL);
+        return Objects.hash(notificationId, reference, content, uri, template, oneClickUnsubscribeURL, sanitisedContent);
     }
 
     @Override
@@ -183,6 +194,7 @@ public class NotifyEmailResponse {
                 ", uri=" + uri +
                 ", template=" + template +
                 ", oneClickUnsubscribeURL=" + oneClickUnsubscribeURL +
+                ", sanitisedContent=" + sanitisedContent +
                 '}';
     }
 }
