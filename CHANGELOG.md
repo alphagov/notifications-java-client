@@ -1,3 +1,6 @@
+## 6.2.0-RELEASE
+* Updated dependencies to latest versions
+
 ## 6.1.0-RELEASE
 * Add a `sanitiseContentFor` parameter to `sendEmail`, a list of placeholders, the content of which you want Notify to sanitise.
 
