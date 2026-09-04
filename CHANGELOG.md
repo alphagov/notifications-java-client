@@ -1,3 +1,6 @@
+## 6.3.0-RELEASE
+* Add `personalisationParameters` to the `Template` object returned by `getTemplateById`, `getTemplateVersion` and `getAllTemplates`. This is a list of the distinct placeholder names in the template, for example `["name"]`.
+
 ## 6.2.0-RELEASE
 * Updated dependencies to latest versions
 

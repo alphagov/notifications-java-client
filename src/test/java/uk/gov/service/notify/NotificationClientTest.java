@@ -677,6 +677,7 @@ public class NotificationClientTest {
         assertEquals(expected.getBody(), actual.getBody());
         assertEquals(expected.getSubject(), actual.getSubject().get());
         assertEquals(expected.getLetterContactBlock(), actual.getLetterContactBlock().get());
+        assertEquals(expected.getPersonalisationParameters(), actual.getPersonalisationParameters());
 
         validateRequest();
     }
@@ -704,6 +705,7 @@ public class NotificationClientTest {
         assertEquals(expected.getBody(), actual.getBody());
         assertEquals(expected.getSubject(), actual.getSubject().get());
         assertEquals(expected.getLetterContactBlock(), actual.getLetterContactBlock().get());
+        assertEquals(expected.getPersonalisationParameters(), actual.getPersonalisationParameters());
 
         validateRequest();
     }
@@ -732,6 +734,7 @@ public class NotificationClientTest {
         assertEquals(expected.getTemplates().get(0).getBody(), actual.getTemplates().get(0).getBody());
         assertEquals(expected.getTemplates().get(0).getSubject(), actual.getTemplates().get(0).getSubject().get());
         assertEquals(expected.getTemplates().get(0).getLetterContactBlock(), actual.getTemplates().get(0).getLetterContactBlock().get());
+        assertEquals(expected.getTemplates().get(0).getPersonalisationParameters(), actual.getTemplates().get(0).getPersonalisationParameters());
 
         LoggedRequest request = validateRequest();
         assertEquals("foo", request.queryParameter("type").firstValue());

@@ -1,8 +1,12 @@
 package uk.gov.service.notify;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -18,6 +22,7 @@ public class Template {
     private String body;
     private String subject;
     private Map<String, Object> personalisation;
+    private List<String> personalisationParameters;
     private String letterContactBlock;
 
 
@@ -44,6 +49,19 @@ public class Template {
         letterContactBlock = data.isNull("letter_contact_block") ? null : data.getString("letter_contact_block");
         personalisation = data.isNull("personalisation") ? null :
                 JsonUtils.jsonToMap(data.getJSONObject("personalisation"));
+        personalisationParameters = parsePersonalisationParameters(data);
+    }
+
+    private List<String> parsePersonalisationParameters(JSONObject data) {
+        if (!data.has("personalisation_parameters") || data.isNull("personalisation_parameters")) {
+            return Collections.emptyList();
+        }
+        JSONArray parameters = data.getJSONArray("personalisation_parameters");
+        List<String> parsed = new ArrayList<>();
+        for (int i = 0; i < parameters.length(); i++) {
+            parsed.add(parameters.getString(i));
+        }
+        return parsed;
     }
 
     public UUID getId() {
@@ -134,6 +152,14 @@ public class Template {
         this.personalisation = personalisation;
     }
 
+    public List<String> getPersonalisationParameters() {
+        return personalisationParameters;
+    }
+
+    public void setPersonalisationParameters(List<String> personalisationParameters) {
+        this.personalisationParameters = personalisationParameters;
+    }
+
     @Override
     public String toString() {
         return "Template{" +
@@ -147,6 +173,7 @@ public class Template {
                 ", subject='" + subject + '\'' +
                 ", letterContactBlock='" + letterContactBlock + '\'' +
                 ", personalisation='" + personalisation + '\'' +
+                ", personalisationParameters='" + personalisationParameters + '\'' +
                 '}';
     }
 }
