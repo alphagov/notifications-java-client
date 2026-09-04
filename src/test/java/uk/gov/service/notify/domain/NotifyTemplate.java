@@ -3,7 +3,6 @@ package uk.gov.service.notify.domain;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.time.ZonedDateTime;
-import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -19,7 +18,6 @@ public class NotifyTemplate {
     private final String body;
     private final String subject;
     private final String letterContactBlock;
-    private final List<String> personalisationParameters;
 
     public NotifyTemplate(@JsonProperty("id") UUID id,
                           @JsonProperty("name") String name,
@@ -30,8 +28,7 @@ public class NotifyTemplate {
                           @JsonProperty("created_by") String createdBy,
                           @JsonProperty("body") String body,
                           @JsonProperty("subject") String subject,
-                          @JsonProperty("letter_contact_block") String letterContactBlock,
-                          @JsonProperty("personalisation_parameters") List<String> personalisationParameters) {
+                          @JsonProperty("letter_contact_block") String letterContactBlock) {
 
         this.id = id;
         this.name = name;
@@ -43,7 +40,6 @@ public class NotifyTemplate {
         this.body = body;
         this.subject = subject;
         this.letterContactBlock = letterContactBlock;
-        this.personalisationParameters = personalisationParameters;
     }
 
     @JsonProperty("id")
@@ -96,22 +92,17 @@ public class NotifyTemplate {
         return letterContactBlock;
     }
 
-    @JsonProperty("personalisation_parameters")
-    public List<String> getPersonalisationParameters() {
-        return personalisationParameters;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         NotifyTemplate that = (NotifyTemplate) o;
-        return version == that.version && Objects.equals(id, that.id) && Objects.equals(name, that.name) && Objects.equals(type, that.type) && Objects.equals(createdAt, that.createdAt) && Objects.equals(updatedAt, that.updatedAt) && Objects.equals(createdBy, that.createdBy) && Objects.equals(body, that.body) && Objects.equals(subject, that.subject) && Objects.equals(letterContactBlock, that.letterContactBlock) && Objects.equals(personalisationParameters, that.personalisationParameters);
+        return version == that.version && Objects.equals(id, that.id) && Objects.equals(name, that.name) && Objects.equals(type, that.type) && Objects.equals(createdAt, that.createdAt) && Objects.equals(updatedAt, that.updatedAt) && Objects.equals(createdBy, that.createdBy) && Objects.equals(body, that.body) && Objects.equals(subject, that.subject) && Objects.equals(letterContactBlock, that.letterContactBlock);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, type, createdAt, updatedAt, version, createdBy, body, subject, letterContactBlock, personalisationParameters);
+        return Objects.hash(id, name, type, createdAt, updatedAt, version, createdBy, body, subject, letterContactBlock);
     }
 
     @Override
@@ -127,7 +118,6 @@ public class NotifyTemplate {
                 ", body='" + body + '\'' +
                 ", subject='" + subject + '\'' +
                 ", letterContactBlock='" + letterContactBlock + '\'' +
-                ", personalisationParameters=" + personalisationParameters +
                 '}';
     }
 }

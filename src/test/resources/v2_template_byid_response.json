@@ -8,6 +8,5 @@
   "created_by": "an email address",
   "body": "a body",
   "subject": "a subject",
-  "letter_contact_block": "a letter_contact_block",
-  "personalisation_parameters": ["name"]
+  "letter_contact_block": "a letter_contact_block"
 }

@@ -1,6 +1,5 @@
 package uk.gov.service.notify;
 
-import org.jose4j.json.internal.json_simple.JSONArray;
 import org.jose4j.json.internal.json_simple.JSONObject;
 import org.junit.Test;
 
@@ -36,11 +35,6 @@ public class TemplateTest {
 
         content.put("personalisation", personalisation);
 
-        JSONArray personalisationParameters = new JSONArray();
-        personalisationParameters.add("placeholder");
-        personalisationParameters.add("conditional");
-        content.put("personalisation_parameters", personalisationParameters);
-
         Template template = new Template(content.toString());
         assertEquals(UUID.fromString(id), template.getId());
         assertEquals("my template", template.getName());
@@ -58,7 +52,6 @@ public class TemplateTest {
         expectedPersonalisation.put("conditional", expectedPersonalisationProperty);
 
         assertEquals(Optional.of(expectedPersonalisation), template.getPersonalisation());
-        assertEquals(java.util.Arrays.asList("placeholder", "conditional"), template.getPersonalisationParameters());
     }
 
 
@@ -87,7 +80,6 @@ public class TemplateTest {
         assertEquals("The body of the template. For ((name)) eyes only.", template.getBody());
         assertEquals(Optional.empty(), template.getSubject());
         assertEquals(Optional.empty(), template.getPersonalisation());
-        assertEquals(java.util.Collections.emptyList(), template.getPersonalisationParameters());
     }
 
 }
