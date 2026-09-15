@@ -1,3 +1,7 @@
+## 6.2.1-RELEASE
+* Updated httpclient5 from 5.6.2 to 5.6.3
+* fixed a build issue for the test image by using amazoncoretto as the new base image
+
 ## 6.2.0-RELEASE
 * Updated dependencies to latest versions
 
